@@ -1,0 +1,129 @@
+package opnsense
+
+import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
+	"github.com/gobuffalo/envy"
+	"github.com/satori/go.uuid"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"time"
+)
+
+type Client struct {
+	baseURL *url.URL
+	key     string
+	secret  string
+	c       *http.Client
+}
+
+func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, error) {
+	httpClient := &http.Client{
+		Timeout: 100 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: InsecureSkipVerify,
+			},
+		},
+	}
+
+	url, err := url.Parse(baseUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &Client{
+		baseURL: url,
+		key:     envy.Get("OPNSENSE_KEY", key),
+		secret:  envy.Get("OPNSENSE_SECRET", secret),
+		c:       httpClient,
+	}
+
+	return client, nil
+}
+
+func (c *Client) Get(api string) (resp *http.Response, err error) {
+	url := c.baseURL.String() + api
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.SetBasicAuth(c.key, c.secret)
+
+	return c.c.Do(request)
+}
+
+func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
+	resp, err := c.Get(api)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(body, responseData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err error) {
+	url := c.baseURL.String() + api
+
+	request, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// request.Header.Set("Content-Type", "application/json")
+	request.SetBasicAuth(c.key, c.secret)
+
+	return c.c.Do(request)
+}
+
+func (c *Client) PostAndMarshal(api string, requestData interface{}, responseData interface{}) error {
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.Post(api, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(body, responseData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Generic types
+
+type StatusMessage struct {
+	Status string    `json:"status"`
+	MsgID  uuid.UUID `json:"msg_uuid"`
+}
+
+type GenericResponse struct {
+	Response string `json:"response"`
+}
