@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path"
 	"time"
 )
 
@@ -47,7 +48,7 @@ func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, e
 }
 
 func (c *Client) Get(api string) (resp *http.Response, err error) {
-	url := c.baseURL.String() + api
+	url := path.Join(c.baseURL.String(), api)
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -84,7 +85,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 }
 
 func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err error) {
-	url := c.baseURL.String() + api
+	url := path.Join(c.baseURL.String(), api)
 
 	request, err := http.NewRequest("POST", url, body)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/satori/go.uuid"
 	"log"
+	"path"
 )
 
 func (c *Client) WireGuardRestart() (*GenericResponse, error) {
@@ -146,7 +147,7 @@ type WireGuardClientGet struct {
 }
 
 func (c *Client) WireGuardGetClient(uuid uuid.UUID) (*WireGuardClientGet, error) {
-	api := "wireguard/client/getclient/" + uuid.String()
+	api := path.Join("wireguard/client/getclient", uuid.String())
 
 	var response WireGuardClientGet
 	err := c.GetAndUnmarshal(api, &response)
@@ -192,7 +193,7 @@ func (c *Client) WireGuardGetClients() ([]*WireGuardClientGet, error) {
 }
 
 func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSet) (*GenericResponse, error) {
-	api := "wireguard/client/setclient/" + uuid.String()
+	api := path.Join("wireguard/client/setclient", uuid.String())
 
 	var response GenericResponse
 	err := c.PostAndMarshal(api, clientConf, &response)
@@ -232,7 +233,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 }
 
 func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error) {
-	api := "wireguard/client/addclient/" + uuid.String()
+	api := path.Join("wireguard/client/addclient", uuid.String())
 
 	var response GenericResponse
 	err := c.PostAndMarshal(api, nil, &response)
@@ -276,7 +277,7 @@ type WireGuardServerGet struct {
 }
 
 func (c *Client) WireGuardGetServer(uuid uuid.UUID) (*WireGuardServerGet, error) {
-	api := "wireguard/server/getserver/" + uuid.String()
+	api := path.Join("wireguard/server/getserver", uuid.String())
 
 	var response WireGuardServerGet
 	err := c.GetAndUnmarshal(api, &response)
@@ -322,7 +323,7 @@ func (c *Client) WireGuardGetServers() ([]*WireGuardServerGet, error) {
 }
 
 func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSet) (*GenericResponse, error) {
-	api := "wireguard/server/setserver/" + uuid.String()
+	api := path.Join("wireguard/server/setserver/", uuid.String())
 
 	var response GenericResponse
 	err := c.PostAndMarshal(api, serverConf, &response)
@@ -362,7 +363,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 }
 
 func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error) {
-	api := "wireguard/server/addserver/" + uuid.String()
+	api := path.Join("wireguard/server/addserver/", uuid.String())
 
 	var response GenericResponse
 	err := c.PostAndMarshal(api, nil, &response)
