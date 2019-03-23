@@ -195,8 +195,12 @@ func (c *Client) WireGuardGetClients() ([]*WireGuardClientGet, error) {
 func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSet) (*GenericResponse, error) {
 	api := path.Join("wireguard/client/setclient", uuid.String())
 
+	request := map[string]interface{}{
+		"client": clientConf,
+	}
+
 	var response GenericResponse
-	err := c.PostAndMarshal(api, clientConf, &response)
+	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -215,8 +219,12 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, error) {
 	api := "wireguard/client/addclient"
 
+	request := map[string]interface{}{
+		"client": clientConf,
+	}
+
 	var response GenericResponseUUID
-	err := c.PostAndMarshal(api, clientConf, &response)
+	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
