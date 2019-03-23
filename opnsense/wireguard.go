@@ -126,14 +126,14 @@ func (c *Client) WireGuardDisableService() error {
 }
 
 type WireGuardClientBase struct {
-	UUID          uuid.UUID `json:"uuid,omitempty"`
-	Enabled       string    `json:"enabled"`
-	Name          string    `json:"name"`
-	PubKey        string    `json:"pubkey"`
-	Psk           string    `json:"psk"`
-	ServerAddress string    `json:"serveraddress"`
-	ServerPort    string    `json:"serverport"`
-	KeepAlive     string    `json:"keepalive"`
+	UUID          *uuid.UUID `json:"uuid,omitempty"`
+	Enabled       string     `json:"enabled"`
+	Name          string     `json:"name"`
+	PubKey        string     `json:"pubkey"`
+	Psk           string     `json:"psk"`
+	ServerAddress string     `json:"serveraddress"`
+	ServerPort    string     `json:"serverport"`
+	KeepAlive     string     `json:"keepalive"`
 }
 
 type WireGuardClientSet struct {
@@ -253,13 +253,13 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 }
 
 type WireGuardServerBase struct {
-	UUID          uuid.UUID `json:"uuid,omitempty"`
-	Enabled       string    `json:"enabled"`
-	Name          string    `json:"name"`
-	PubKey        string    `json:"pubkey"`
-	PrivKey       string    `json:"privkey"`
-	Port          string    `json:"port"`
-	DisableRoutes string    `json:"disableroutes"`
+	UUID          *uuid.UUID `json:"uuid,omitempty"`
+	Enabled       string     `json:"enabled"`
+	Name          string     `json:"name"`
+	PubKey        string     `json:"pubkey"`
+	PrivKey       string     `json:"privkey"`
+	Port          string     `json:"port"`
+	DisableRoutes string     `json:"disableroutes"`
 }
 type WireGuardServerSet struct {
 	WireGuardServerBase
