@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -50,6 +51,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+		log.Printf("[ERROR] Failed to create GET request: %#v", err)
 		return nil, err
 	}
 
@@ -61,17 +63,20 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	resp, err := c.Get(api)
 	if err != nil {
+		log.Printf("[ERROR] Failed to GET request: %#v", err)
 		return err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("[ERROR] Failed to read GET response: %#v", err)
 		return err
 	}
 
 	err = json.Unmarshal(body, responseData)
 	if err != nil {
+		log.Printf("[ERROR] Failed to unmarshal GET response: %#v", err)
 		return err
 	}
 
@@ -83,6 +88,7 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 
 	request, err := http.NewRequest("POST", url, body)
 	if err != nil {
+		log.Printf("[ERROR] Failed to create POST request: %#v", err)
 		return nil, err
 	}
 
@@ -95,22 +101,26 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 func (c *Client) PostAndMarshal(api string, requestData interface{}, responseData interface{}) error {
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {
+		log.Printf("[ERROR] Failed to marshal requestData for POST request: %#v", err)
 		return err
 	}
 
 	resp, err := c.Post(api, bytes.NewBuffer(requestBody))
 	if err != nil {
+		log.Printf("[ERROR] Failed to POST request: %#v", err)
 		return err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("[ERROR] Failed to read POST response: %#v", err)
 		return err
 	}
 
 	err = json.Unmarshal(body, responseData)
 	if err != nil {
+		log.Printf("[ERROR] Failed to unmarshal POST response: %#v", err)
 		return err
 	}
 
