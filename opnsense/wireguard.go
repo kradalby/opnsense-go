@@ -126,7 +126,7 @@ func (c *Client) WireGuardDisableService() error {
 }
 
 type WireGuardClientBase struct {
-	UUID          uuid.UUID `json:"uuid"`
+	UUID          uuid.UUID `json:"uuid,omitempty"`
 	Enabled       string    `json:"enabled"`
 	Name          string    `json:"name"`
 	PubKey        string    `json:"pubkey"`
@@ -253,7 +253,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 }
 
 type WireGuardServerBase struct {
-	UUID          uuid.UUID `json:"uuid"`
+	UUID          uuid.UUID `json:"uuid,omitempty"`
 	Enabled       string    `json:"enabled"`
 	Name          string    `json:"name"`
 	PubKey        string    `json:"pubkey"`
