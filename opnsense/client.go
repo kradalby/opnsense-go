@@ -85,7 +85,8 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 }
 
 func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err error) {
-	url := path.Join(c.baseURL.String(), api)
+	// url := path.Join(c.baseURL.String(), api)
+	url := c.baseURL.String() + "/" + api
 
 	request, err := http.NewRequest("POST", url, body)
 	if err != nil {
