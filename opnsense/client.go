@@ -50,6 +50,7 @@ func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, e
 func (c *Client) Get(api string) (resp *http.Response, err error) {
 	// url := path.Join(c.baseURL.String(), api)
 	url := c.baseURL.String() + "/" + api
+	log.Printf("[TRACE] GET to %s", url)
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -57,6 +58,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 		return nil, err
 	}
 
+	// request.Header.Set("Content-Type", "application/json")
 	request.SetBasicAuth(c.key, c.secret)
 
 	return c.c.Do(request)
@@ -77,6 +79,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	}
 
 	err = json.Unmarshal(body, responseData)
+	log.Printf("[TRACE] Response body: %s\n", string(body))
 	if err != nil {
 		log.Printf("[ERROR] Failed to unmarshal GET response: %#v\n", err)
 		return err
@@ -88,6 +91,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err error) {
 	// url := path.Join(c.baseURL.String(), api)
 	url := c.baseURL.String() + "/" + api
+	log.Printf("[TRACE] POST to %s", url)
 
 	request, err := http.NewRequest("POST", url, body)
 	if err != nil {

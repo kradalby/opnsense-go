@@ -7,7 +7,7 @@ import (
 
 func main() {
 	// c, err := opnsense.NewClient("http://127.0.0.1:8080/api/", "", "", true)
-	c, err := opnsense.NewClient("https://172.16.207.143/api/", "", "", true)
+	c, err := opnsense.NewClient("https://172.16.207.143/api", "", "", true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func main() {
 	// err = c.WireGuardEnableService()
 	// log.Printf("Error: %#v", err)
 
-	uuids, err := c.WireGuardGetServers()
+	uuids, err := c.WireGuardGetClients()
 	if err != nil {
 		log.Printf("Error: %#v", err)
 	}
