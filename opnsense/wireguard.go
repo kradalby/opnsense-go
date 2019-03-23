@@ -255,7 +255,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Result != "delete" {
+	if response.Result != "deleted" {
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %#v", response),
 		)
@@ -388,7 +388,7 @@ func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Result != "delete" {
+	if response.Result != "deleted" {
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %#v", response),
 		)
