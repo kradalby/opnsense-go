@@ -48,7 +48,8 @@ func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, e
 }
 
 func (c *Client) Get(api string) (resp *http.Response, err error) {
-	url := path.Join(c.baseURL.String(), api)
+	// url := path.Join(c.baseURL.String(), api)
+	url := c.baseURL.String() + "/" + api
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -106,6 +107,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 		log.Printf("[ERROR] Failed to marshal requestData for POST request: %#v\n", err)
 		return err
 	}
+	log.Printf("[TRACE] Request payload: %s", string(requestBody))
 
 	resp, err := c.Post(api, bytes.NewBuffer(requestBody))
 	if err != nil {
