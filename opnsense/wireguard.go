@@ -91,7 +91,7 @@ func (c *Client) WireGuardSetSettings(settings WireGuardSettings) (*GenericRespo
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -204,7 +204,7 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -224,7 +224,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -244,7 +244,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -334,7 +334,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -354,7 +354,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
@@ -374,7 +374,7 @@ func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error)
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %s", response.Response),
 		)
-		log.Printf("[ERROR] %#v", err)
+		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
 
