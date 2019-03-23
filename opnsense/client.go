@@ -22,7 +22,7 @@ type Client struct {
 
 func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, error) {
 	httpClient := &http.Client{
-		Timeout: 100 * time.Second,
+		Timeout: 5 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: InsecureSkipVerify,
@@ -86,7 +86,7 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 		return nil, err
 	}
 
-	// request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Content-Type", "application/json")
 	request.SetBasicAuth(c.key, c.secret)
 
 	return c.c.Do(request)
@@ -126,4 +126,21 @@ type StatusMessage struct {
 
 type GenericResponse struct {
 	Response string `json:"response"`
+}
+
+type GenericResponseUUID struct {
+	Response string    `json:"response"`
+	UUID     uuid.UUID `json:"uuid"`
+}
+
+type Selected struct {
+	Value    string `json:"value"`
+	Selected int    `json:"selected"`
+}
+
+type SearchResult struct {
+	Rows     []interface{} `json:"rows"`
+	RowCount int           `json:"rowCount"`
+	Total    int           `json:"total"`
+	Current  int           `json:"current"`
 }
