@@ -88,7 +88,7 @@ func (c *Client) WireGuardSetSettings(settings WireGuardSettings) (*GenericRespo
 		return nil, err
 	}
 
-	if response.Response != "saved" {
+	if response.Result != "saved" {
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
@@ -205,7 +205,7 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 		return nil, err
 	}
 
-	if response.Response != "saved" {
+	if response.Result != "saved" {
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
@@ -229,7 +229,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 		return nil, err
 	}
 
-	if response.Response != "saved" {
+	if response.Result != "saved" {
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
@@ -249,7 +249,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Response != "delete" {
+	if response.Result != "delete" {
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %#v", response),
 		)
@@ -339,7 +339,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 		return nil, err
 	}
 
-	if response.Response != "saved" {
+	if response.Result != "saved" {
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
@@ -359,7 +359,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 		return nil, err
 	}
 
-	if response.Response != "saved" {
+	if response.Result != "saved" {
 		err := errors.New(
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
@@ -379,7 +379,7 @@ func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Response != "delete" {
+	if response.Result != "delete" {
 		err := errors.New(
 			fmt.Sprintf("Failed to delete, response from server: %#v", response),
 		)

@@ -140,12 +140,12 @@ type StatusMessage struct {
 }
 
 type GenericResponse struct {
-	Response string `json:"response"`
+	Result string `json:"result"`
 }
 
 type GenericResponseUUID struct {
-	Response string    `json:"response"`
-	UUID     uuid.UUID `json:"uuid"`
+	Result string    `json:"result"`
+	UUID   uuid.UUID `json:"uuid"`
 }
 
 type Selected struct {
