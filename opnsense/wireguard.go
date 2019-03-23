@@ -90,7 +90,7 @@ func (c *Client) WireGuardSetSettings(settings WireGuardSettings) (*GenericRespo
 
 	if response.Response != "saved" {
 		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to save, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -207,7 +207,7 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 
 	if response.Response != "saved" {
 		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to save, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -231,7 +231,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 
 	if response.Response != "saved" {
 		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to save, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -251,7 +251,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 
 	if response.Response != "delete" {
 		err := errors.New(
-			fmt.Sprintf("Failed to delete, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to delete, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -341,7 +341,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 
 	if response.Response != "saved" {
 		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to save, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -361,7 +361,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 
 	if response.Response != "saved" {
 		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to save, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
@@ -381,7 +381,7 @@ func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error)
 
 	if response.Response != "delete" {
 		err := errors.New(
-			fmt.Sprintf("Failed to delete, response from server: %s", response.Response),
+			fmt.Sprintf("Failed to delete, response from server: %#v", response.Response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
