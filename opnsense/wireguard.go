@@ -125,21 +125,21 @@ type WireGuardClientBase struct {
 	UUID          uuid.UUID `json:"uuid"`
 	Enabled       string    `json:"enabled"`
 	Name          string    `json:"name"`
-	Pubkey        string    `json:"pubkey"`
+	PubKey        string    `json:"pubkey"`
 	Psk           string    `json:"psk"`
-	Serveraddress string    `json:"serveraddress"`
-	Serverport    string    `json:"serverport"`
-	Keepalive     string    `json:"keepalive"`
+	ServerAddress string    `json:"serveraddress"`
+	ServerPort    string    `json:"serverport"`
+	KeepAlive     string    `json:"keepalive"`
 }
 
 type WireGuardClientSet struct {
 	WireGuardClientBase
-	Tunneladdress string `json:"tunneladdress"`
+	TunnelAddress string `json:"tunneladdress"`
 }
 
 type WireGuardClientGet struct {
 	WireGuardClientBase
-	Tunneladdress map[string]Selected `json:"tunneladdress"`
+	TunnelAddress map[string]Selected `json:"tunneladdress"`
 }
 
 func (c *Client) WireGuardGetClient(uuid uuid.UUID) (*WireGuardClientGet, error) {
@@ -246,15 +246,15 @@ type WireGuardServerBase struct {
 	UUID          uuid.UUID `json:"uuid"`
 	Enabled       string    `json:"enabled"`
 	Name          string    `json:"name"`
-	Pubkey        string    `json:"pubkey"`
-	Privkey       string    `json:"privkey"`
+	PubKey        string    `json:"pubkey"`
+	PrivKey       string    `json:"privkey"`
 	Port          string    `json:"port"`
-	Disableroutes string    `json:"disableroutes"`
+	DisableRoutes string    `json:"disableroutes"`
 }
 type WireGuardServerSet struct {
 	WireGuardServerBase
 	DNS           string `json:"dns"`
-	Tunneladdress string `json:"tunneladdress"`
+	TunnelAddress string `json:"tunneladdress"`
 	// comma list of UUID
 	Peers string `json:"peers"`
 }
@@ -262,7 +262,7 @@ type WireGuardServerSet struct {
 type WireGuardServerGet struct {
 	WireGuardServerBase
 	DNS           map[string]Selected `json:"dns"`
-	Tunneladdress map[string]Selected `json:"tunneladdress"`
+	TunnelAddress map[string]Selected `json:"tunneladdress"`
 	Peers         map[string]Selected `json:"peers"`
 }
 
