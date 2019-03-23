@@ -149,10 +149,16 @@ type WireGuardClientGet struct {
 func (c *Client) WireGuardGetClient(uuid uuid.UUID) (*WireGuardClientGet, error) {
 	api := path.Join("wireguard/client/getclient", uuid.String())
 
-	var response WireGuardClientGet
+	type Response struct {
+		Client WireGuardClientGet `json:"client"`
+	}
+	var response Response
+
 	err := c.GetAndUnmarshal(api, &response)
 
-	return &response, err
+	log.Printf("client: %#v", response.Client)
+
+	return &response.Client, err
 }
 
 func (c *Client) WireGuardGetClientUUIDs() ([]*uuid.UUID, error) {
@@ -287,10 +293,13 @@ type WireGuardServerGet struct {
 func (c *Client) WireGuardGetServer(uuid uuid.UUID) (*WireGuardServerGet, error) {
 	api := path.Join("wireguard/server/getserver", uuid.String())
 
-	var response WireGuardServerGet
+	type Response struct {
+		Server WireGuardServerGet `json:"server"`
+	}
+	var response Response
 	err := c.GetAndUnmarshal(api, &response)
 
-	return &response, err
+	return &response.Server, err
 }
 
 func (c *Client) WireGuardGetServerUUIDs() ([]*uuid.UUID, error) {
