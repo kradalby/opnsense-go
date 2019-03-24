@@ -326,6 +326,29 @@ func (c *Client) WireGuardGetServerUUIDs() ([]*uuid.UUID, error) {
 	return uuids, err
 }
 
+func (c *Client) WireGuardFindServerUUIDByName(name string) ([]*uuid.UUID, error) {
+	api := "wireguard/server/searchserver"
+
+	var response SearchResult
+	err := c.GetAndUnmarshal(api, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	uuids := []*uuid.UUID{}
+	for _, row := range response.Rows {
+		m := row.(map[string]interface{})
+		if m["name"].(string) == name {
+			uuid, err := uuid.FromString(m["uuid"].(string))
+			if err == nil {
+				uuids = append(uuids, &uuid)
+			}
+		}
+	}
+
+	return uuids, err
+}
+
 func (c *Client) WireGuardGetServers() ([]*WireGuardServerGet, error) {
 	uuids, err := c.WireGuardGetServerUUIDs()
 	if err != nil {
