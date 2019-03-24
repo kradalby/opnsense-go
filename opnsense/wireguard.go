@@ -274,6 +274,7 @@ type WireGuardServerBase struct {
 	PrivKey       string     `json:"privkey"`
 	Port          string     `json:"port"`
 	DisableRoutes string     `json:"disableroutes"`
+	Instance      *string    `json:"instance,omitempty"`
 }
 type WireGuardServerSet struct {
 	WireGuardServerBase
