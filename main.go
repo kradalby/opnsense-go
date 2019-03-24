@@ -28,10 +28,10 @@ func main() {
 	// err = c.WireGuardEnableService()
 	// log.Printf("Error: %#v", err)
 
-	uuids, err := c.WireGuardGetClients()
+	b, err := c.Backup()
 	if err != nil {
 		log.Printf("Error: %#v", err)
 	}
-	log.Printf("%#v,", uuids)
+	log.Printf("%s", b)
 
 }
