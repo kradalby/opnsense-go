@@ -149,14 +149,25 @@ type GenericResponse struct {
 	Validations map[string]string `json:"validations,omitempty"`
 }
 
-type Selected struct {
-	Value    string `json:"value"`
-	Selected int    `json:"selected"`
-}
-
 type SearchResult struct {
 	Rows     []interface{} `json:"rows"`
 	RowCount int           `json:"rowCount"`
 	Total    int           `json:"total"`
 	Current  int           `json:"current"`
+}
+
+// Helpers
+type Selected struct {
+	Value    string `json:"value"`
+	Selected int    `json:"selected"`
+}
+
+func listSelected(m map[string]Selected) []string {
+	s := []string{}
+	for _, value := range m {
+		if value.Selected == 1 {
+			s = append(s, value.Value)
+		}
+	}
+	return s
 }
