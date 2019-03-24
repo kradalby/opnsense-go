@@ -389,7 +389,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 	return &response, nil
 }
 
-func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, error) {
+func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) error {
 	api := "wireguard/server/addserver"
 
 	request := map[string]interface{}{
@@ -399,7 +399,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 	var response GenericResponse
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if response.Result != "saved" {
@@ -407,10 +407,10 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 			fmt.Sprintf("Failed to save, response from server: %#v", response),
 		)
 		log.Printf("[ERROR] %#v\n", err)
-		return nil, err
+		return err
 	}
 
-	return response.UUID, nil
+	return nil
 }
 
 func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error) {
