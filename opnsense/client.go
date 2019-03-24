@@ -144,12 +144,9 @@ type StatusMessage struct {
 }
 
 type GenericResponse struct {
-	Result string `json:"result"`
-}
-
-type GenericResponseUUID struct {
-	Result string    `json:"result"`
-	UUID   uuid.UUID `json:"uuid"`
+	Result      string            `json:"result"`
+	UUID        *uuid.UUID        `json:"uuid,omitempty"`
+	Validations map[string]string `json:"validations,omitempty"`
 }
 
 type Selected struct {

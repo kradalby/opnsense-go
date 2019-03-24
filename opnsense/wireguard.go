@@ -229,7 +229,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 		"client": clientConf,
 	}
 
-	var response GenericResponseUUID
+	var response GenericResponse
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
@@ -243,7 +243,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 		return nil, err
 	}
 
-	return &response.UUID, nil
+	return response.UUID, nil
 }
 
 func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error) {
@@ -362,7 +362,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, error) {
 	api := "wireguard/server/addserver"
 
-	var response GenericResponseUUID
+	var response GenericResponse
 	err := c.PostAndMarshal(api, serverConf, &response)
 	if err != nil {
 		return nil, err
@@ -376,7 +376,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) (*uuid.UUID, 
 		return nil, err
 	}
 
-	return &response.UUID, nil
+	return response.UUID, nil
 }
 
 func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error) {
