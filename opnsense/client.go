@@ -162,11 +162,20 @@ type Selected struct {
 	Selected int    `json:"selected"`
 }
 
-func ListSelected(m map[string]Selected) []string {
+func ListSelectedValues(m map[string]Selected) []string {
 	s := []string{}
 	for _, value := range m {
 		if value.Selected == 1 {
 			s = append(s, value.Value)
+		}
+	}
+	return s
+}
+func ListSelectedKeys(m map[string]Selected) []string {
+	s := []string{}
+	for key, value := range m {
+		if value.Selected == 1 {
+			s = append(s, key)
 		}
 	}
 	return s
