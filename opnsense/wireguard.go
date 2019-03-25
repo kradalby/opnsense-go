@@ -8,6 +8,8 @@ import (
 	"path"
 )
 
+// Requires: os-wireguard-devel
+
 func (c *Client) WireGuardRestart() (*GenericResponse, error) {
 	api := "wireguard/service/restart"
 
