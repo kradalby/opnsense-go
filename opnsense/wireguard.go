@@ -1,11 +1,11 @@
 package opnsense
 
 import (
-	"errors"
 	"fmt"
-	"github.com/satori/go.uuid"
 	"log"
 	"path"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 // Requires: os-wireguard-devel
@@ -91,9 +91,7 @@ func (c *Client) WireGuardSetSettings(settings WireGuardSettings) (*GenericRespo
 	}
 
 	if response.Result != "saved" {
-		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
@@ -214,9 +212,7 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 	}
 
 	if response.Result != "saved" {
-		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
@@ -238,9 +234,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 	}
 
 	if response.Result != "saved" {
-		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
@@ -258,9 +252,7 @@ func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error)
 	}
 
 	if response.Result != "deleted" {
-		err := errors.New(
-			fmt.Sprintf("Failed to delete, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
@@ -382,9 +374,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 	}
 
 	if response.Result != "saved" {
-		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
@@ -406,9 +396,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) error {
 	}
 
 	if response.Result != "saved" {
-		err := errors.New(
-			fmt.Sprintf("Failed to save, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return err
 	}
@@ -426,9 +414,7 @@ func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error)
 	}
 
 	if response.Result != "deleted" {
-		err := errors.New(
-			fmt.Sprintf("Failed to delete, response from server: %#v", response),
-		)
+		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
 		return nil, err
 	}
