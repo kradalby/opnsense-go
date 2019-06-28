@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/kradalby/opnsense-go/opnsense"
 	"log"
+
+	"github.com/kradalby/opnsense-go/opnsense"
 )
 
 func main() {
@@ -28,10 +29,16 @@ func main() {
 	// err = c.WireGuardEnableService()
 	// log.Printf("Error: %#v", err)
 
-	b, err := c.Backup()
+	// b, err := c.Backup()
+	// if err != nil {
+	// 	log.Printf("Error: %#v", err)
+	// }
+	// log.Printf("%s", b)
+
+	clients, err := c.BgpGetNeighborUUIDs()
 	if err != nil {
 		log.Printf("Error: %#v", err)
 	}
-	log.Printf("%s", b)
+	log.Printf("%#v", clients)
 
 }
