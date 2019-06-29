@@ -72,7 +72,7 @@ type WireGuardSettingsGeneral struct {
 	Enabled string `json:"enabled"`
 }
 
-func (c *Client) WireGuardGetSettings() (*WireGuardSettings, error) {
+func (c *Client) WireGuardSettingsGet() (*WireGuardSettings, error) {
 	api := "wireguard/general/get"
 
 	var response WireGuardSettings
@@ -81,7 +81,7 @@ func (c *Client) WireGuardGetSettings() (*WireGuardSettings, error) {
 	return &response, err
 }
 
-func (c *Client) WireGuardSetSettings(settings WireGuardSettings) (*GenericResponse, error) {
+func (c *Client) WireGuardSettingsSet(settings WireGuardSettings) (*GenericResponse, error) {
 	api := "wireguard/general/set"
 
 	var response GenericResponse
@@ -105,7 +105,7 @@ func (c *Client) WireGuardEnableService() error {
 			Enabled: "1",
 		},
 	}
-	_, err := c.WireGuardSetSettings(ws)
+	_, err := c.WireGuardSettingsSet(ws)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (c *Client) WireGuardDisableService() error {
 			Enabled: "0",
 		},
 	}
-	_, err := c.WireGuardSetSettings(ws)
+	_, err := c.WireGuardSettingsSet(ws)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ type WireGuardClientGet struct {
 	TunnelAddress map[string]Selected `json:"tunneladdress"`
 }
 
-func (c *Client) WireGuardGetClient(uuid uuid.UUID) (*WireGuardClientGet, error) {
+func (c *Client) WireGuardClientGet(uuid uuid.UUID) (*WireGuardClientGet, error) {
 	api := path.Join("wireguard/client/getclient", uuid.String())
 
 	type Response struct {
@@ -161,7 +161,7 @@ func (c *Client) WireGuardGetClient(uuid uuid.UUID) (*WireGuardClientGet, error)
 	return &response.Client, err
 }
 
-func (c *Client) WireGuardGetClientUUIDs() ([]*uuid.UUID, error) {
+func (c *Client) WireGuardClientGetUUIDs() ([]*uuid.UUID, error) {
 	api := "wireguard/client/searchclient"
 
 	var response SearchResult
@@ -182,15 +182,15 @@ func (c *Client) WireGuardGetClientUUIDs() ([]*uuid.UUID, error) {
 	return uuids, err
 }
 
-func (c *Client) WireGuardGetClients() ([]*WireGuardClientGet, error) {
-	uuids, err := c.WireGuardGetClientUUIDs()
+func (c *Client) WireGuardClientList() ([]*WireGuardClientGet, error) {
+	uuids, err := c.WireGuardClientGetUUIDs()
 	if err != nil {
 		return nil, err
 	}
 
 	clients := []*WireGuardClientGet{}
 	for _, uuid := range uuids {
-		client, err := c.WireGuardGetClient(*uuid)
+		client, err := c.WireGuardClientGet(*uuid)
 		if err == nil {
 			clients = append(clients, client)
 		}
@@ -198,7 +198,7 @@ func (c *Client) WireGuardGetClients() ([]*WireGuardClientGet, error) {
 	return clients, nil
 }
 
-func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSet) (*GenericResponse, error) {
+func (c *Client) WireGuardClientSet(uuid uuid.UUID, clientConf WireGuardClientSet) (*GenericResponse, error) {
 	api := path.Join("wireguard/client/setclient", uuid.String())
 
 	request := map[string]interface{}{
@@ -220,7 +220,7 @@ func (c *Client) WireGuardSetClient(uuid uuid.UUID, clientConf WireGuardClientSe
 	return &response, nil
 }
 
-func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, error) {
+func (c *Client) WireGuardClientAdd(clientConf WireGuardClientSet) (*uuid.UUID, error) {
 	api := "wireguard/client/addclient"
 
 	request := map[string]interface{}{
@@ -242,7 +242,7 @@ func (c *Client) WireGuardAddClient(clientConf WireGuardClientSet) (*uuid.UUID, 
 	return response.UUID, nil
 }
 
-func (c *Client) WireGuardDeleteClient(uuid uuid.UUID) (*GenericResponse, error) {
+func (c *Client) WireGuardClientDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	api := path.Join("wireguard/client/delclient", uuid.String())
 
 	var response GenericResponse
@@ -285,7 +285,7 @@ type WireGuardServerGet struct {
 	Peers         map[string]Selected `json:"peers"`
 }
 
-func (c *Client) WireGuardGetServer(uuid uuid.UUID) (*WireGuardServerGet, error) {
+func (c *Client) WireGuardServerGet(uuid uuid.UUID) (*WireGuardServerGet, error) {
 	api := path.Join("wireguard/server/getserver", uuid.String())
 
 	type Response struct {
@@ -300,7 +300,7 @@ func (c *Client) WireGuardGetServer(uuid uuid.UUID) (*WireGuardServerGet, error)
 	return &response.Server, err
 }
 
-func (c *Client) WireGuardGetServerUUIDs() ([]*uuid.UUID, error) {
+func (c *Client) WireGuardServerGetUUIDs() ([]*uuid.UUID, error) {
 	api := "wireguard/server/searchserver"
 
 	var response SearchResult
@@ -321,7 +321,7 @@ func (c *Client) WireGuardGetServerUUIDs() ([]*uuid.UUID, error) {
 	return uuids, err
 }
 
-func (c *Client) WireGuardFindServerUUIDByName(name string) ([]*uuid.UUID, error) {
+func (c *Client) WireGuardServerFindUUIDByName(name string) ([]*uuid.UUID, error) {
 	api := "wireguard/server/searchserver"
 
 	var response SearchResult
@@ -344,15 +344,15 @@ func (c *Client) WireGuardFindServerUUIDByName(name string) ([]*uuid.UUID, error
 	return uuids, err
 }
 
-func (c *Client) WireGuardGetServers() ([]*WireGuardServerGet, error) {
-	uuids, err := c.WireGuardGetServerUUIDs()
+func (c *Client) WireGuardServerList() ([]*WireGuardServerGet, error) {
+	uuids, err := c.WireGuardServerGetUUIDs()
 	if err != nil {
 		return nil, err
 	}
 
 	servers := []*WireGuardServerGet{}
 	for _, uuid := range uuids {
-		server, err := c.WireGuardGetServer(*uuid)
+		server, err := c.WireGuardServerGet(*uuid)
 		if err == nil {
 			servers = append(servers, server)
 		}
@@ -360,7 +360,7 @@ func (c *Client) WireGuardGetServers() ([]*WireGuardServerGet, error) {
 	return servers, nil
 }
 
-func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSet) (*GenericResponse, error) {
+func (c *Client) WireGuardServerSet(uuid uuid.UUID, serverConf WireGuardServerSet) (*GenericResponse, error) {
 	api := path.Join("wireguard/server/setserver", uuid.String())
 
 	request := map[string]interface{}{
@@ -382,7 +382,7 @@ func (c *Client) WireGuardSetServer(uuid uuid.UUID, serverConf WireGuardServerSe
 	return &response, nil
 }
 
-func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) error {
+func (c *Client) WireGuardServerAdd(serverConf WireGuardServerSet) error {
 	api := "wireguard/server/addserver"
 
 	request := map[string]interface{}{
@@ -404,7 +404,7 @@ func (c *Client) WireGuardAddServer(serverConf WireGuardServerSet) error {
 	return nil
 }
 
-func (c *Client) WireGuardDeleteServer(uuid uuid.UUID) (*GenericResponse, error) {
+func (c *Client) WireGuardServerDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	api := path.Join("wireguard/server/delserver", uuid.String())
 
 	var response GenericResponse

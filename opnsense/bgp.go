@@ -75,7 +75,7 @@ type Routemaps struct {
 	Routemap []interface{} `json:"routemap"`
 }
 
-func (c *Client) BgpGetNeighbor(uuid uuid.UUID) (*BgpNeighborGet, error) {
+func (c *Client) BgpNeighborGet(uuid uuid.UUID) (*BgpNeighborGet, error) {
 	api := path.Join("quagga/bgp/getNeighbor", uuid.String())
 
 	type Response struct {
@@ -90,7 +90,7 @@ func (c *Client) BgpGetNeighbor(uuid uuid.UUID) (*BgpNeighborGet, error) {
 	return &response.Neighbor, err
 }
 
-func (c *Client) BgpGetNeighborUUIDs() ([]*uuid.UUID, error) {
+func (c *Client) BgpNeighborGetUUIDs() ([]*uuid.UUID, error) {
 	api := "quagga/bgp/searchNeighbor"
 
 	var response SearchResult
@@ -111,22 +111,22 @@ func (c *Client) BgpGetNeighborUUIDs() ([]*uuid.UUID, error) {
 	return uuids, err
 }
 
-func (c *Client) BgpGetNeighbors() ([]*BgpNeighborGet, error) {
-	uuids, err := c.BgpGetNeighborUUIDs()
+func (c *Client) BgpNeighborList() ([]*BgpNeighborGet, error) {
+	uuids, err := c.BgpNeighborGetUUIDs()
 	if err != nil {
 		return nil, err
 	}
 
 	clients := []*BgpNeighborGet{}
 	for _, uuid := range uuids {
-		client, err := c.BgpGetNeighbor(*uuid)
+		client, err := c.BgpNeighborGet(*uuid)
 		if err == nil {
 			clients = append(clients, client)
 		}
 	}
 	return clients, nil
 }
-func (c *Client) BgpSetClient(uuid uuid.UUID, clientConf BgpNeighborSet) (*GenericResponse, error) {
+func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*GenericResponse, error) {
 	api := path.Join("quagga/bgp/setNeighbor", uuid.String())
 
 	request := map[string]interface{}{
@@ -148,7 +148,7 @@ func (c *Client) BgpSetClient(uuid uuid.UUID, clientConf BgpNeighborSet) (*Gener
 	return &response, nil
 }
 
-func (c *Client) BgpAddNeighbor(clientConf BgpNeighborSet) (*uuid.UUID, error) {
+func (c *Client) BgpNeighborAdd(clientConf BgpNeighborSet) (*uuid.UUID, error) {
 	api := "quagga/bgp/addNeighbor"
 
 	request := map[string]interface{}{
@@ -170,7 +170,7 @@ func (c *Client) BgpAddNeighbor(clientConf BgpNeighborSet) (*uuid.UUID, error) {
 	return response.UUID, nil
 }
 
-func (c *Client) BgpDeleteNeighbor(uuid uuid.UUID) (*GenericResponse, error) {
+func (c *Client) BgpNeighborDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	api := path.Join("quagga/bgp/delNeighbor", uuid.String())
 
 	var response GenericResponse
