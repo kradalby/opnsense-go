@@ -85,7 +85,8 @@ func (c *Client) BgpNeighborGet(uuid uuid.UUID) (*BgpNeighborGet, error) {
 
 	err := c.GetAndUnmarshal(api, &response)
 
-	log.Printf("client: %#v", response.Neighbor)
+	// UUID does not exist in the JSON, so we add it since we know it.
+	response.Neighbor.UUID = &uuid
 
 	return &response.Neighbor, err
 }

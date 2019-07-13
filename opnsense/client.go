@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"github.com/gobuffalo/envy"
-	"github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+
+	"github.com/gobuffalo/envy"
+	uuid "github.com/satori/go.uuid"
+
 	// "path"
 	"time"
 )
@@ -22,12 +24,13 @@ type Client struct {
 	c       *http.Client
 }
 
-func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, error) {
+func NewClient(baseUrl, key, secret string, insecureSkipVerify bool) (*Client, error) {
+	log.Printf("[TRACE] Creating new OPNsense client with url: %s, key: %s, secret: %s, insecure: %t", baseUrl, key, secret, insecureSkipVerify)
 	httpClient := &http.Client{
 		Timeout: 5 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: InsecureSkipVerify,
+				InsecureSkipVerify: insecureSkipVerify,
 			},
 		},
 	}
@@ -36,6 +39,7 @@ func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, e
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("[TRACE] Parsed URL: %s", url.String())
 
 	client := &Client{
 		baseURL: url,
@@ -49,7 +53,7 @@ func NewClient(baseUrl, key, secret string, InsecureSkipVerify bool) (*Client, e
 
 func (c *Client) Get(api string) (resp *http.Response, err error) {
 	// url := path.Join(c.baseURL.String(), api)
-	url := c.baseURL.String() + "/" + api
+	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] GET to %s", url)
 
 	request, err := http.NewRequest("GET", url, nil)
@@ -67,7 +71,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	resp, err := c.Get(api)
 	if err != nil {
-		log.Printf("[ERROR] Failed to GET request: %#v\n", err)
+		log.Printf("[ERROR] Failed to GET request: %s\n", err)
 		return err
 	}
 
@@ -90,7 +94,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 
 func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err error) {
 	// url := path.Join(c.baseURL.String(), api)
-	url := c.baseURL.String() + "/" + api
+	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] POST to %s", url)
 
 	request, err := http.NewRequest("POST", url, body)
@@ -99,8 +103,8 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 		return nil, err
 	}
 
-	request.Header.Set("Content-Type", "application/json")
 	request.SetBasicAuth(c.key, c.secret)
+	request.Header.Set("Content-Type", "application/json")
 
 	return c.c.Do(request)
 }

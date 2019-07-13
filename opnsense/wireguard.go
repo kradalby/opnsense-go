@@ -156,7 +156,8 @@ func (c *Client) WireGuardClientGet(uuid uuid.UUID) (*WireGuardClientGet, error)
 
 	err := c.GetAndUnmarshal(api, &response)
 
-	log.Printf("client: %#v", response.Client)
+	// UUID does not exist in the JSON, so we add it since we know it.
+	response.Client.UUID = &uuid
 
 	return &response.Client, err
 }
@@ -295,7 +296,8 @@ func (c *Client) WireGuardServerGet(uuid uuid.UUID) (*WireGuardServerGet, error)
 
 	err := c.GetAndUnmarshal(api, &response)
 
-	log.Printf("server: %#v", response.Server)
+	// UUID does not exist in the JSON, so we add it since we know it.
+	response.Server.UUID = &uuid
 
 	return &response.Server, err
 }

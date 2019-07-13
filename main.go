@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// c, err := opnsense.NewClient("http://127.0.0.1:8080/api/", "", "", true)
-	c, err := opnsense.NewClient("https://172.16.207.143/api", "", "", true)
+	c, err := opnsense.NewClient("http://localhost:8080", "", "", true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 	// }
 	// log.Printf("%s", b)
 
-	clients, err := c.BgpGetNeighborUUIDs()
+	clients, err := c.BgpNeighborList()
 	if err != nil {
 		log.Printf("Error: %#v", err)
 	}
