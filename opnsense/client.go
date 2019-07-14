@@ -27,7 +27,7 @@ type Client struct {
 func NewClient(baseUrl, key, secret string, insecureSkipVerify bool) (*Client, error) {
 	log.Printf("[TRACE] Creating new OPNsense client with url: %s, key: %s, secret: %s, insecure: %t", baseUrl, key, secret, insecureSkipVerify)
 	httpClient := &http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: insecureSkipVerify,
