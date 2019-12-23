@@ -268,6 +268,7 @@ type WireGuardServerBase struct {
 	PubKey        string     `json:"pubkey"`
 	PrivKey       string     `json:"privkey"`
 	Port          string     `json:"port"`
+	MTU           string     `json:"mtu"`
 	DisableRoutes string     `json:"disableroutes"`
 	Instance      *string    `json:"instance,omitempty"`
 }
