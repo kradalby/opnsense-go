@@ -43,11 +43,11 @@ type BgpNeighborBase struct {
 
 type BgpNeighborGet struct {
 	BgpNeighborBase
-	Updatesource        map[string]Selected `json:"updatesource"`
-	LinkedPrefixlistIn  map[string]Selected `json:"linkedPrefixlistIn"`
-	LinkedPrefixlistOut map[string]Selected `json:"linkedPrefixlistOut"`
-	LinkedRoutemapIn    map[string]Selected `json:"linkedRoutemapIn"`
-	LinkedRoutemapOut   map[string]Selected `json:"linkedRoutemapOut"`
+	Updatesource        SelectedMap `json:"updatesource"`
+	LinkedPrefixlistIn  SelectedMap `json:"linkedPrefixlistIn"`
+	LinkedPrefixlistOut SelectedMap `json:"linkedPrefixlistOut"`
+	LinkedRoutemapIn    SelectedMap `json:"linkedRoutemapIn"`
+	LinkedRoutemapOut   SelectedMap `json:"linkedRoutemapOut"`
 }
 
 type BgpNeighborSet struct {
@@ -64,11 +64,11 @@ type Prefixlists struct {
 }
 
 type Redistribute struct {
-	OSPF      map[string]Selected `json:"ospf"`
-	Connected map[string]Selected `json:"connected"`
-	Kernel    map[string]Selected `json:"kernel"`
-	RIP       map[string]Selected `json:"rip"`
-	Static    map[string]Selected `json:"static"`
+	OSPF      SelectedMap `json:"ospf"`
+	Connected SelectedMap `json:"connected"`
+	Kernel    SelectedMap `json:"kernel"`
+	RIP       SelectedMap `json:"rip"`
+	Static    SelectedMap `json:"static"`
 }
 
 type Routemaps struct {

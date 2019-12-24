@@ -48,6 +48,8 @@ func NewClient(baseUrl, key, secret string, insecureSkipVerify bool) (*Client, e
 		c:       httpClient,
 	}
 
+	log.Printf("[TRACE] Finished setting up client: %#v", client)
+
 	return client, nil
 }
 
@@ -168,13 +170,22 @@ type SelectedMap map[string]Selected
 // very inconvinient and this function tries to work
 // around this by making the map pointer an empty map
 // if the there is an empty array.
-func (sm SelectedMap) UnmarshalJSON(b []byte) error {
-	if string(b) == "[]" {
-		sm = SelectedMap{}
-	}
-	err := json.Unmarshal(b, &sm)
+func (sm *SelectedMap) UnmarshalJSON(b []byte) error {
+	*sm = SelectedMap{}
+	type Alias SelectedMap
+
+	var temp2 Alias
+	err := json.Unmarshal(b, &temp2)
 	if err != nil {
-		return err
+		var temp []string
+		err := json.Unmarshal(b, &temp)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	for key, value := range temp2 {
+		(*sm)[key] = value
 	}
 	return nil
 }
