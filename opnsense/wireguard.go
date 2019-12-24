@@ -143,7 +143,7 @@ type WireGuardClientSet struct {
 
 type WireGuardClientGet struct {
 	WireGuardClientBase
-	TunnelAddress map[string]Selected `json:"tunneladdress"`
+	TunnelAddress SelectedMap `json:"tunneladdress"`
 }
 
 func (c *Client) WireGuardClientGet(uuid uuid.UUID) (*WireGuardClientGet, error) {
@@ -282,9 +282,9 @@ type WireGuardServerSet struct {
 
 type WireGuardServerGet struct {
 	WireGuardServerBase
-	DNS           map[string]Selected `json:"dns"`
-	TunnelAddress map[string]Selected `json:"tunneladdress"`
-	Peers         map[string]Selected `json:"peers"`
+	DNS           SelectedMap `json:"dns"`
+	TunnelAddress SelectedMap `json:"tunneladdress"`
+	Peers         SelectedMap `json:"peers"`
 }
 
 func (c *Client) WireGuardServerGet(uuid uuid.UUID) (*WireGuardServerGet, error) {

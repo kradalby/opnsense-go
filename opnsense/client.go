@@ -161,12 +161,30 @@ type SearchResult struct {
 }
 
 // Helpers
+type SelectedMap map[string]Selected
+
+// The OPNsense API returns a [] when there is no
+// objects in the list of selected items. This is
+// very inconvinient and this function tries to work
+// around this by making the map pointer an empty map
+// if the there is an empty array.
+func (sm SelectedMap) UnmarshalJSON(b []byte) error {
+	if string(b) == "[]" {
+		sm = SelectedMap{}
+	}
+	err := json.Unmarshal(b, &sm)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type Selected struct {
 	Value    string `json:"value"`
 	Selected int    `json:"selected"`
 }
 
-func ListSelectedValues(m map[string]Selected) []string {
+func ListSelectedValues(m SelectedMap) []string {
 	s := []string{}
 	for _, value := range m {
 		if value.Selected == 1 {
@@ -175,7 +193,7 @@ func ListSelectedValues(m map[string]Selected) []string {
 	}
 	return s
 }
-func ListSelectedKeys(m map[string]Selected) []string {
+func ListSelectedKeys(m SelectedMap) []string {
 	s := []string{}
 	for key, value := range m {
 		if value.Selected == 1 {
