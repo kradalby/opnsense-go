@@ -14,6 +14,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	// "path"
+	"fmt"
 	"time"
 )
 
@@ -82,6 +83,14 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
 		return err
+	}
+
+	// The OPNsense API does not return 404 when you fetch something that does
+	// not exist, but returns an empty list instead. Check for the empty list
+	// and return a 404 error instead so implmenters could handle that error
+	// differently
+	if string(body) == "[]" {
+		return fmt.Errorf("found empty array, most likely 404")
 	}
 
 	err = json.Unmarshal(body, responseData)
