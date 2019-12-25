@@ -85,6 +85,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	}
 
 	err = json.Unmarshal(body, responseData)
+	log.Printf("[TRACE] Response for URL: %s\n", api)
 	log.Printf("[TRACE] Response body: %s\n", string(body))
 	if err != nil {
 		log.Printf("[ERROR] Failed to unmarshal GET response: %#v\n", err)
