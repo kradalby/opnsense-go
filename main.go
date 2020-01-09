@@ -4,11 +4,11 @@ import (
 	"log"
 
 	"github.com/kradalby/opnsense-go/opnsense"
+	"github.com/satori/go.uuid"
 )
 
 func main() {
-	// c, err := opnsense.NewClient("http://127.0.0.1:8080/api/", "", "", true)
-	c, err := opnsense.NewClient("http://localhost:8080", "", "", true)
+	// c, err := opnsense.NewClient("http://localhost:8080", "", "", true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,10 +35,14 @@ func main() {
 	// }
 	// log.Printf("%s", b)
 
-	clients, err := c.BgpNeighborList()
-	if err != nil {
-		log.Printf("Error: %#v", err)
-	}
-	log.Printf("%#v", clients)
+	// clients, err := c.BgpNeighborList()
+	// if err != nil {
+	// 	log.Printf("Error: %#v", err)
+	// }
+
+	u, _ := uuid.FromString("9cc6398c-26ca-4cae-8ff0-8bb97114bdd0")
+	resp, err := c.WireGuardServerGet(u)
+	log.Println(err)
+	log.Printf("%#v", resp)
 
 }
