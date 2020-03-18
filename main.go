@@ -8,10 +8,7 @@ import (
 )
 
 func main() {
-	c, err := opnsense.NewClient("http://192.168.45.128",
-		"98JfUoQ9QI8YUsUZ6h1eGG9PHaEFnBELf5ANlV/lTv5bWchyPOyZVV2a70rdDV0PvThBwzYYSLR0c/J1",
-		"MlMrlTkepR+CNuqpZ/dpBYcloiWogKPtgixM988MuPK7hYUtMFUsI1AQoHhfuqhEdEDPK0BXW8SN7V/0",
-		true)
+	c, err := opnsense.NewClient("http://localhost:8080", "", "", true)
 
 	if err != nil {
 		log.Fatal(err)
