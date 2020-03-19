@@ -85,6 +85,12 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 		return err
 	}
 
+	// add possible internal error from the OPNSense API
+	if resp.StatusCode == 500 {
+		log.Printf("[ERROR] Internal Error status code received: %#v\n", string(body))
+		return fmt.Errorf("Internal Error status code received")
+	}
+
 	// The OPNsense API does not return 404 when you fetch something that does
 	// not exist, but returns an empty list instead. Check for the empty list
 	// and return a 404 error instead so implmenters could handle that error

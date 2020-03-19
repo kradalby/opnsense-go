@@ -8,3 +8,4 @@ Currently the parts of the API thats needed for other projects are implemented:
 * BGP Neighbors
 * Backup
 * Package management
+* Alias
