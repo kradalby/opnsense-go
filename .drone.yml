@@ -3,6 +3,9 @@ kind: pipeline
 type: kubernetes
 name: default
 
+node_selector:
+  drone: "true"
+
 steps:
   - name: lint
     image: golangci/golangci-lint:latest
@@ -16,14 +19,17 @@ steps:
       - gox -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
 
   - name: notify
+    pull: if-not-exists
     image: drillster/drone-email
-    host: smtp.fap.no
-    skip_verify: true
-    port: 25
-    from: drone@drone.fap.no
-    recipients: [kradalby@kradalby.no]
+    settings:
+      from: drone@drone.fap.no
+      host: smtp.fap.no
+      port: 25
+      recipients:
+        - kradalby@kradalby.no
+      skip_verify: true
     when:
-      status: [success, changed, failure]
-
-node_selector:
-  drone: "true"
+      status:
+        - success
+        - changed
+        - failure
