@@ -5,6 +5,7 @@ func (c *Client) PowerOff() (*StatusMessage, error) {
 
 	var status StatusMessage
 	err := c.PostAndMarshal(api, nil, &status)
+
 	if err != nil {
 		return nil, err
 	}
@@ -17,6 +18,7 @@ func (c *Client) Reboot() (*StatusMessage, error) {
 
 	var status StatusMessage
 	err := c.PostAndMarshal(api, nil, &status)
+
 	if err != nil {
 		return nil, err
 	}
@@ -28,6 +30,7 @@ func (c *Client) Upgrade() (*StatusMessage, error) {
 	api := "core/firmware/upgrade"
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -40,6 +43,7 @@ func (c *Client) Audit() (*StatusMessage, error) {
 	api := "core/firmware/audit"
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -67,6 +71,7 @@ func (c *Client) SetFirmwareConfig(config FirmwareConfig) (*StatusMessage, error
 	api := "core/firmware/setfirmwareconfig"
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, config, &status)
 	if err != nil {
 		return nil, err
@@ -169,6 +174,7 @@ func (c *Client) PackageInstall(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/install/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -181,6 +187,7 @@ func (c *Client) PackageReInstall(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/reinstall/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -193,6 +200,7 @@ func (c *Client) PackageRemove(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/remove/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -205,6 +213,7 @@ func (c *Client) PackageLock(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/lock/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -217,6 +226,7 @@ func (c *Client) PackageUnlock(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/unlock/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -229,6 +239,7 @@ func (c *Client) PackageDetails(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/details/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
@@ -241,6 +252,7 @@ func (c *Client) PackageLicense(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/license/" + packageName
 
 	var status StatusMessage
+
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err

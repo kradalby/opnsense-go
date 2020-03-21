@@ -14,6 +14,7 @@ func (c *Client) WireGuardRestart() (*GenericResponse, error) {
 	api := "wireguard/service/restart"
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
@@ -26,6 +27,7 @@ func (c *Client) WireGuardStart() (*GenericResponse, error) {
 	api := "wireguard/service/start"
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
@@ -38,6 +40,7 @@ func (c *Client) WireGuardStop() (*GenericResponse, error) {
 	api := "wireguard/service/stop"
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
@@ -85,14 +88,16 @@ func (c *Client) WireGuardSettingsSet(settings WireGuardSettings) (*GenericRespo
 	api := "wireguard/general/set"
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, settings, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -105,10 +110,12 @@ func (c *Client) WireGuardEnableService() error {
 			Enabled: "1",
 		},
 	}
+
 	_, err := c.WireGuardSettingsSet(ws)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -118,10 +125,12 @@ func (c *Client) WireGuardDisableService() error {
 			Enabled: "0",
 		},
 	}
+
 	_, err := c.WireGuardSettingsSet(ws)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -152,6 +161,7 @@ func (c *Client) WireGuardClientGet(uuid uuid.UUID) (*WireGuardClientGet, error)
 	type Response struct {
 		Client WireGuardClientGet `json:"client"`
 	}
+
 	var response Response
 
 	err := c.GetAndUnmarshal(api, &response)
@@ -166,14 +176,17 @@ func (c *Client) WireGuardClientGetUUIDs() ([]*uuid.UUID, error) {
 	api := "wireguard/client/searchclient"
 
 	var response SearchResult
+
 	err := c.GetAndUnmarshal(api, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	uuids := []*uuid.UUID{}
+
 	for _, row := range response.Rows {
 		m := row.(map[string]interface{})
+
 		uuid, err := uuid.FromString(m["uuid"].(string))
 		if err == nil {
 			uuids = append(uuids, &uuid)
@@ -190,12 +203,14 @@ func (c *Client) WireGuardClientList() ([]*WireGuardClientGet, error) {
 	}
 
 	clients := []*WireGuardClientGet{}
+
 	for _, uuid := range uuids {
 		client, err := c.WireGuardClientGet(*uuid)
 		if err == nil {
 			clients = append(clients, client)
 		}
 	}
+
 	return clients, nil
 }
 
@@ -207,14 +222,16 @@ func (c *Client) WireGuardClientSet(uuid uuid.UUID, clientConf WireGuardClientSe
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -229,14 +246,16 @@ func (c *Client) WireGuardClientAdd(clientConf WireGuardClientSet) (*uuid.UUID, 
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -247,14 +266,16 @@ func (c *Client) WireGuardClientDelete(uuid uuid.UUID) (*GenericResponse, error)
 	api := path.Join("wireguard/client/delclient", uuid.String())
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "deleted" {
-		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
+	if response.Result != deleted {
+		err := fmt.Errorf("failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -293,6 +314,7 @@ func (c *Client) WireGuardServerGet(uuid uuid.UUID) (*WireGuardServerGet, error)
 	type Response struct {
 		Server WireGuardServerGet `json:"server"`
 	}
+
 	var response Response
 
 	err := c.GetAndUnmarshal(api, &response)
@@ -307,14 +329,17 @@ func (c *Client) WireGuardServerGetUUIDs() ([]*uuid.UUID, error) {
 	api := "wireguard/server/searchserver"
 
 	var response SearchResult
+
 	err := c.GetAndUnmarshal(api, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	uuids := []*uuid.UUID{}
+
 	for _, row := range response.Rows {
 		m := row.(map[string]interface{})
+
 		uuid, err := uuid.FromString(m["uuid"].(string))
 		if err == nil {
 			uuids = append(uuids, &uuid)
@@ -328,12 +353,14 @@ func (c *Client) WireGuardServerFindUUIDByName(name string) ([]*uuid.UUID, error
 	api := "wireguard/server/searchserver"
 
 	var response SearchResult
+
 	err := c.GetAndUnmarshal(api, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	uuids := []*uuid.UUID{}
+
 	for _, row := range response.Rows {
 		m := row.(map[string]interface{})
 		if m["name"].(string) == name {
@@ -354,12 +381,14 @@ func (c *Client) WireGuardServerList() ([]*WireGuardServerGet, error) {
 	}
 
 	servers := []*WireGuardServerGet{}
+
 	for _, uuid := range uuids {
 		server, err := c.WireGuardServerGet(*uuid)
 		if err == nil {
 			servers = append(servers, server)
 		}
 	}
+
 	return servers, nil
 }
 
@@ -371,14 +400,16 @@ func (c *Client) WireGuardServerSet(uuid uuid.UUID, serverConf WireGuardServerSe
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -393,14 +424,16 @@ func (c *Client) WireGuardServerAdd(serverConf WireGuardServerSet) error {
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return err
 	}
 
@@ -411,14 +444,16 @@ func (c *Client) WireGuardServerDelete(uuid uuid.UUID) (*GenericResponse, error)
 	api := path.Join("wireguard/server/delserver", uuid.String())
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "deleted" {
-		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
+	if response.Result != deleted {
+		err := fmt.Errorf("failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 

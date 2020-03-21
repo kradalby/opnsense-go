@@ -1,0 +1,12 @@
+linters:
+  fast: false
+  presets:
+    - style
+    - bugs
+    - unused
+    - format
+  disable:
+    - interfacer
+    - gomnd
+    - godox
+    - funlen

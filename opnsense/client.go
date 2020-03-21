@@ -13,9 +13,14 @@ import (
 	"github.com/gobuffalo/envy"
 	uuid "github.com/satori/go.uuid"
 
-	// "path"
 	"fmt"
 	"time"
+)
+
+const (
+	saved   = "saved"
+	deleted = "deleted"
+	done    = "done"
 )
 
 type Client struct {
@@ -25,21 +30,30 @@ type Client struct {
 	c       *http.Client
 }
 
-func NewClient(baseUrl, key, secret string, insecureSkipVerify bool) (*Client, error) {
-	log.Printf("[TRACE] Creating new OPNsense client with url: %s, key: %s, secret: %s, insecure: %t", baseUrl, key, secret, insecureSkipVerify)
+func NewClient(baseURL, key, secret string, insecureSkipVerify bool) (*Client, error) {
+	log.Printf(
+		"[TRACE] Creating new OPNsense client with url: %s, key: %s, secret: %s, insecure: %t",
+		baseURL,
+		key,
+		secret,
+		insecureSkipVerify,
+	)
+
 	httpClient := &http.Client{
 		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
+			/* #nosec */
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: insecureSkipVerify,
 			},
 		},
 	}
 
-	url, err := url.Parse(baseUrl)
+	url, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
+
 	log.Printf("[TRACE] Parsed URL: %s", url.String())
 
 	client := &Client{
@@ -79,6 +93,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	}
 
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
@@ -88,7 +103,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	// add possible internal error from the OPNSense API
 	if resp.StatusCode == 500 {
 		log.Printf("[ERROR] Internal Error status code received: %#v\n", string(body))
-		return fmt.Errorf("Internal Error status code received")
+		return fmt.Errorf("internal Error status code received")
 	}
 
 	// The OPNsense API does not return 404 when you fetch something that does
@@ -100,8 +115,10 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	}
 
 	err = json.Unmarshal(body, responseData)
+
 	log.Printf("[TRACE] Response for URL: %s\n", api)
 	log.Printf("[TRACE] Response body: %s\n", string(body))
+
 	if err != nil {
 		log.Printf("[ERROR] Failed to unmarshal GET response: %#v\n", err)
 		return err
@@ -133,6 +150,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 		log.Printf("[ERROR] Failed to marshal requestData for POST request: %#v\n", err)
 		return err
 	}
+
 	log.Printf("[TRACE] Request payload: %s", string(requestBody))
 
 	resp, err := c.Post(api, bytes.NewBuffer(requestBody))
@@ -142,6 +160,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 	}
 
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read POST response: %#v\n", err)
@@ -152,6 +171,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 	if err != nil {
 		log.Printf("[ERROR] Failed to unmarshal POST response: %#v\n", err)
 		log.Printf("[ERROR] Failed to unmarshal POST response: %s\n", string(body))
+
 		return err
 	}
 
@@ -188,21 +208,27 @@ type SelectedMap map[string]Selected
 // if the there is an empty array.
 func (sm *SelectedMap) UnmarshalJSON(b []byte) error {
 	*sm = SelectedMap{}
+
 	type Alias SelectedMap
 
 	var temp2 Alias
+
 	err := json.Unmarshal(b, &temp2)
 	if err != nil {
 		var temp []string
+
 		err := json.Unmarshal(b, &temp)
 		if err != nil {
 			return err
 		}
+
 		return nil
 	}
+
 	for key, value := range temp2 {
 		(*sm)[key] = value
 	}
+
 	return nil
 }
 
@@ -213,19 +239,23 @@ type Selected struct {
 
 func ListSelectedValues(m SelectedMap) []string {
 	s := []string{}
+
 	for _, value := range m {
 		if value.Selected == 1 {
 			s = append(s, value.Value)
 		}
 	}
+
 	return s
 }
 func ListSelectedKeys(m SelectedMap) []string {
 	s := []string{}
+
 	for key, value := range m {
 		if value.Selected == 1 {
 			s = append(s, key)
 		}
 	}
+
 	return s
 }

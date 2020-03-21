@@ -72,29 +72,30 @@ func (c *Client) AliasGet(uuid uuid.UUID) (*AliasFormat, error) {
 	type Response struct {
 		Alias AliasGet `json:"alias"`
 	}
-	var raw_response Response
 
-	err := c.GetAndUnmarshal(path.Join("firewall/alias/getItem", uuid.String()), &raw_response)
+	var rawResponse Response
+
+	err := c.GetAndUnmarshal(path.Join("firewall/alias/getItem", uuid.String()), &rawResponse)
 	if err != nil {
 		return nil, err
 	}
 
 	var response AliasFormat
 	response.UUID = &uuid
-	response.Enabled = raw_response.Alias.Enabled == "1"
-	response.Name = raw_response.Alias.Name
-	response.Description = raw_response.Alias.Description
-	response.Updatefreq = raw_response.Alias.Updatefreq
-	response.Counters = raw_response.Alias.Counters
+	response.Enabled = rawResponse.Alias.Enabled == "1"
+	response.Name = rawResponse.Alias.Name
+	response.Description = rawResponse.Alias.Description
+	response.Updatefreq = rawResponse.Alias.Updatefreq
+	response.Counters = rawResponse.Alias.Counters
 
-	for k, v := range raw_response.Alias.Type {
+	for k, v := range rawResponse.Alias.Type {
 		if v.Selected == 1 && k != "" {
 			response.Type = k
 			break
 		}
 	}
 
-	for k, v := range raw_response.Alias.Content {
+	for k, v := range rawResponse.Alias.Content {
 		if v.Selected == 1 && k != "" {
 			response.Content = append(response.Content, v.Value)
 		}
@@ -123,14 +124,17 @@ func (c *Client) AliasUpdate(uuid uuid.UUID, conf AliasFormat) (*GenericResponse
 	request.Alias = AliasFormatToSet(conf)
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(path.Join("firewall/alias/setItem", uuid.String()), request, &response)
+
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -141,18 +145,22 @@ func (c *Client) AliasAdd(conf AliasFormat) (*uuid.UUID, error) {
 	type Request struct {
 		Alias AliasSet `json:"alias"`
 	}
+
 	var request Request
+
 	request.Alias = AliasFormatToSet(conf)
 
 	var response GenericResponse
 	err := c.PostAndMarshal("firewall/alias/addItem", request, &response)
+
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -167,6 +175,7 @@ func AliasFormatToSet(conf AliasFormat) AliasSet {
 	} else {
 		set.Enabled = "0"
 	}
+
 	set.Name = conf.Name
 	set.Description = conf.Description
 	set.Updatefreq = conf.Updatefreq
@@ -181,13 +190,15 @@ func AliasFormatToSet(conf AliasFormat) AliasSet {
 func (c *Client) AliasDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	var response GenericResponse
 	err := c.PostAndMarshal(path.Join("firewall/alias/delItem", uuid.String()), nil, &response)
+
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "deleted" {
-		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
+	if response.Result != deleted {
+		err := fmt.Errorf("failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -196,6 +207,7 @@ func (c *Client) AliasDelete(uuid uuid.UUID) (*GenericResponse, error) {
 
 func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 	var response AliasReconfigureResponse
+
 	request := map[string]interface{}{}
 
 	err := c.PostAndMarshal("firewall/alias/reconfigure", request, &response)
@@ -204,8 +216,9 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 	}
 
 	if response.Status != "ok" {
-		err := fmt.Errorf("Failed to reconfigure, response from server: %#v", response)
+		err := fmt.Errorf("failed to reconfigure, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -250,13 +263,15 @@ func (c *Client) AliasUtilsGet(name string) (*AliasUtilsGet, error) {
 func (c *Client) AliasUtilsAdd(name string, request AliasUtilsSet) (*AliasUtilsResponse, error) {
 	var response AliasUtilsResponse
 	err := c.PostAndMarshal(path.Join("firewall/alias_util/add", name), request, &response)
+
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Status != "done" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Status != done {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -266,13 +281,15 @@ func (c *Client) AliasUtilsAdd(name string, request AliasUtilsSet) (*AliasUtilsR
 func (c *Client) AliasUtilsDel(name string, request AliasUtilsSet) (*AliasUtilsResponse, error) {
 	var response AliasUtilsResponse
 	err := c.PostAndMarshal(path.Join("firewall/alias_util/delete", name), request, &response)
+
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Status != "done" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Status != done {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
