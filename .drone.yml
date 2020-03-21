@@ -1,16 +1,21 @@
-pipeline:
-  lint:
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: lint
     image: golangci/golangci-lint:latest
     commands:
       - golangci-lint run -v
 
-  build:
+  - name: build
     image: golang:1.14.1-stretch
     commands:
       - go get github.com/mitchellh/gox
       - gox -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
 
-  notify:
+  - name: notify
     image: drillster/drone-email
     host: smtp.fap.no
     skip_verify: true
