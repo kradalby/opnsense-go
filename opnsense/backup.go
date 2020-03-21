@@ -16,6 +16,7 @@ func (c *Client) Backup() (string, error) {
 	}
 
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)

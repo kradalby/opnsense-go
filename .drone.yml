@@ -1,0 +1,35 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+node_selector:
+  drone: "true"
+
+steps:
+  - name: lint
+    image: golangci/golangci-lint:latest
+    commands:
+      - golangci-lint run -v --timeout 10m
+
+  - name: build
+    image: golang:1.14.1-stretch
+    commands:
+      - go get github.com/mitchellh/gox
+      - gox -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
+
+  - name: notify
+    pull: if-not-exists
+    image: drillster/drone-email
+    settings:
+      from: drone@drone.fap.no
+      host: smtp.fap.no
+      port: 25
+      recipients:
+        - kradalby@kradalby.no
+      skip_verify: true
+    when:
+      status:
+        - success
+        - changed
+        - failure

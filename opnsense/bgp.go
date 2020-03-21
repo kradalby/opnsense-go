@@ -81,6 +81,7 @@ func (c *Client) BgpNeighborGet(uuid uuid.UUID) (*BgpNeighborGet, error) {
 	type Response struct {
 		Neighbor BgpNeighborGet `json:"neighbor"`
 	}
+
 	var response Response
 
 	err := c.GetAndUnmarshal(api, &response)
@@ -95,15 +96,18 @@ func (c *Client) BgpNeighborGetUUIDs() ([]*uuid.UUID, error) {
 	api := "quagga/bgp/searchNeighbor"
 
 	var response SearchResult
+
 	err := c.GetAndUnmarshal(api, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	uuids := []*uuid.UUID{}
+
 	for _, row := range response.Rows {
 		m := row.(map[string]interface{})
 		uuid, err := uuid.FromString(m["uuid"].(string))
+
 		if err == nil {
 			uuids = append(uuids, &uuid)
 		}
@@ -119,12 +123,14 @@ func (c *Client) BgpNeighborList() ([]*BgpNeighborGet, error) {
 	}
 
 	clients := []*BgpNeighborGet{}
+
 	for _, uuid := range uuids {
 		client, err := c.BgpNeighborGet(*uuid)
 		if err == nil {
 			clients = append(clients, client)
 		}
 	}
+
 	return clients, nil
 }
 func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*GenericResponse, error) {
@@ -135,14 +141,16 @@ func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*Gen
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -157,14 +165,16 @@ func (c *Client) BgpNeighborAdd(clientConf BgpNeighborSet) (*uuid.UUID, error) {
 	}
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "saved" {
-		err := fmt.Errorf("Failed to save, response from server: %#v", response)
+	if response.Result != saved {
+		err := fmt.Errorf("failed to save, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
@@ -175,14 +185,16 @@ func (c *Client) BgpNeighborDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	api := path.Join("quagga/bgp/delNeighbor", uuid.String())
 
 	var response GenericResponse
+
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	if response.Result != "deleted" {
-		err := fmt.Errorf("Failed to delete, response from server: %#v", response)
+	if response.Result != deleted {
+		err := fmt.Errorf("failed to delete, response from server: %#v", response)
 		log.Printf("[ERROR] %#v\n", err)
+
 		return nil, err
 	}
 
