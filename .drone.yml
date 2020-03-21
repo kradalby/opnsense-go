@@ -24,3 +24,6 @@ steps:
     recipients: [kradalby@kradalby.no]
     when:
       status: [success, changed, failure]
+
+node_selector:
+  drone: "true"
