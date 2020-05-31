@@ -33,6 +33,7 @@ steps:
         - success
         - changed
         - failure
+
   - name: discord notification
     image: appleboy/drone-discord
     settings:
@@ -40,6 +41,11 @@ steps:
         from_secret: discord_webhook_id
       webhook_token:
         from_secret: discord_webhook_token
+    when:
+      status:
+        - success
+        - changed
+        - failure
 
 ---
 kind: secret
