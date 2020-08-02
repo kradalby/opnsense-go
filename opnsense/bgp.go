@@ -8,7 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// Requires: os-frr
+// Requires: os-frr.
 
 type BGP struct {
 	Enabled   string    `json:"enabled"`
@@ -133,6 +133,7 @@ func (c *Client) BgpNeighborList() ([]*BgpNeighborGet, error) {
 
 	return clients, nil
 }
+
 func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*GenericResponse, error) {
 	api := path.Join("quagga/bgp/setNeighbor", uuid.String())
 
@@ -148,10 +149,8 @@ func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*Gen
 	}
 
 	if response.Result != saved {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] BgpNeighborSet response: %#v", response)
+		return nil, fmt.Errorf("BgpNeighborSet failed: %w", ErrOpnsenseSave)
 	}
 
 	return &response, nil
@@ -172,10 +171,8 @@ func (c *Client) BgpNeighborAdd(clientConf BgpNeighborSet) (*uuid.UUID, error) {
 	}
 
 	if response.Result != saved {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] BgpNeighborAdd response: %#v", response)
+		return nil, fmt.Errorf("BgpNeighborAdd failed: %w", ErrOpnsenseSave)
 	}
 
 	return response.UUID, nil
@@ -192,10 +189,8 @@ func (c *Client) BgpNeighborDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	}
 
 	if response.Result != deleted {
-		err := fmt.Errorf("failed to delete, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] BgpNeighborDelete response: %#v", response)
+		return nil, fmt.Errorf("BgpNeighborDelete failed: %w", ErrOpnsenseDelete)
 	}
 
 	return &response, nil

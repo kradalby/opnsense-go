@@ -4,8 +4,8 @@ func (c *Client) PowerOff() (*StatusMessage, error) {
 	api := "core/firmware/poweroff"
 
 	var status StatusMessage
-	err := c.PostAndMarshal(api, nil, &status)
 
+	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
 	}
@@ -17,8 +17,8 @@ func (c *Client) Reboot() (*StatusMessage, error) {
 	api := "core/firmware/reboot"
 
 	var status StatusMessage
-	err := c.PostAndMarshal(api, nil, &status)
 
+	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
 		return nil, err
 	}

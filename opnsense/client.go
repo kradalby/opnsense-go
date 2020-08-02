@@ -2,25 +2,35 @@ package opnsense
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gobuffalo/envy"
 	uuid "github.com/satori/go.uuid"
-
-	"fmt"
-	"time"
 )
 
 const (
 	saved   = "saved"
 	deleted = "deleted"
 	done    = "done"
+)
+
+var (
+	ErrOpnsenseSave              = errors.New("failed to save")
+	ErrOpnsenseDelete            = errors.New("failed to delete")
+	ErrOpnsenseDone              = errors.New("did not finish")
+	ErrOpnsenseStatusNotOk       = errors.New("status did not return ok")
+	ErrOpnsenseEmptyListNotFound = errors.New("found empty array, most likely 404")
+	ErrOpnsense500               = errors.New("internal server error")
 )
 
 type Client struct {
@@ -73,7 +83,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] GET to %s", url)
 
-	request, err := http.NewRequest("GET", url, nil)
+	request, err := http.NewRequestWithContext(context.TODO(), "GET", url, nil)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create GET request: %#v\n\n", err)
 		return nil, err
@@ -103,7 +113,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	// add possible internal error from the OPNSense API
 	if resp.StatusCode == 500 {
 		log.Printf("[ERROR] Internal Error status code received: %#v\n", string(body))
-		return fmt.Errorf("internal Error status code received")
+		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense500)
 	}
 
 	// The OPNsense API does not return 404 when you fetch something that does
@@ -111,7 +121,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	// and return a 404 error instead so implmenters could handle that error
 	// differently
 	if string(body) == "[]" {
-		return fmt.Errorf("found empty array, most likely 404")
+		return ErrOpnsenseEmptyListNotFound
 	}
 
 	err = json.Unmarshal(body, responseData)
@@ -132,7 +142,7 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] POST to %s", url)
 
-	request, err := http.NewRequest("POST", url, body)
+	request, err := http.NewRequestWithContext(context.TODO(), "POST", url, body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create POST request: %#v\n", err)
 		return nil, err
@@ -198,7 +208,7 @@ type SearchResult struct {
 	Current  int           `json:"current"`
 }
 
-// Helpers
+// Helpers.
 type SelectedMap map[string]Selected
 
 // The OPNsense API returns a [] when there is no
@@ -237,6 +247,41 @@ type Selected struct {
 	Selected int    `json:"selected"`
 }
 
+func (s *Selected) UnmarshalJSON(b []byte) error {
+	*s = Selected{}
+
+	type Alias Selected
+
+	var temp Alias
+
+	err := json.Unmarshal(b, &temp)
+	if err != nil {
+		type Selected2 struct {
+			Value    string `json:"value"`
+			Selected bool   `json:"selected"`
+		}
+
+		var temp2 Selected2
+
+		err := json.Unmarshal(b, &temp2)
+		if err != nil {
+			return err
+		}
+
+		s.Value = temp2.Value
+		if temp2.Selected {
+			s.Selected = 1
+		} else {
+			s.Selected = 0
+		}
+	}
+
+	s.Value = temp.Value
+	s.Selected = temp.Selected
+
+	return nil
+}
+
 func ListSelectedValues(m SelectedMap) []string {
 	s := []string{}
 
@@ -248,6 +293,7 @@ func ListSelectedValues(m SelectedMap) []string {
 
 	return s
 }
+
 func ListSelectedKeys(m SelectedMap) []string {
 	s := []string{}
 
