@@ -8,7 +8,7 @@
    "steps": [
       {
          "commands": [
-            "golangci-lint run -v --timeout 10m"
+            "golangci-lint run -v --timeout 10m --tests=false"
          ],
          "image": "golangci/golangci-lint:latest",
          "name": "Go lint",

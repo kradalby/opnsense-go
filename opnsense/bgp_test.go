@@ -7,7 +7,7 @@ import (
 )
 
 func TestBgpNeighborUnmarshal(t *testing.T) {
-	expectedJson := `
+	expectedJSON := `
 	{
 	  "neighbor": {
 	    "enabled": "1",
@@ -64,13 +64,14 @@ func TestBgpNeighborUnmarshal(t *testing.T) {
 	    }
 	  }
 	}`
+
 	type Response struct {
 		Neighbor BgpNeighborGet `json:"neighbor"`
 	}
 
 	var response Response
 
-	err := json.Unmarshal([]byte(expectedJson), &response)
+	err := json.Unmarshal([]byte(expectedJSON), &response)
 	if err != nil {
 		t.Errorf("Received error from JSON unmarshal, %v", err)
 	}

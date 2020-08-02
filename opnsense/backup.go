@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// Requires: os-api-backup
+// Requires: os-api-backup.
 func (c *Client) Backup() (string, error) {
 	api := "backup/backup/download"
 

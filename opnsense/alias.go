@@ -126,16 +126,13 @@ func (c *Client) AliasUpdate(uuid uuid.UUID, conf AliasFormat) (*GenericResponse
 	var response GenericResponse
 
 	err := c.PostAndMarshal(path.Join("firewall/alias/setItem", uuid.String()), request, &response)
-
 	if err != nil {
 		return nil, err
 	}
 
 	if response.Result != saved {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasUpdate response: %#v", response)
+		return nil, fmt.Errorf("AliasUpdate failed: %w", ErrOpnsenseSave)
 	}
 
 	return &response, nil
@@ -151,17 +148,15 @@ func (c *Client) AliasAdd(conf AliasFormat) (*uuid.UUID, error) {
 	request.Alias = AliasFormatToSet(conf)
 
 	var response GenericResponse
-	err := c.PostAndMarshal("firewall/alias/addItem", request, &response)
 
+	err := c.PostAndMarshal("firewall/alias/addItem", request, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.Result != saved {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasAdd response: %#v", response)
+		return nil, fmt.Errorf("AliasAdd failed: %w", ErrOpnsenseSave)
 	}
 
 	return response.UUID, nil
@@ -189,17 +184,15 @@ func AliasFormatToSet(conf AliasFormat) AliasSet {
 
 func (c *Client) AliasDelete(uuid uuid.UUID) (*GenericResponse, error) {
 	var response GenericResponse
-	err := c.PostAndMarshal(path.Join("firewall/alias/delItem", uuid.String()), nil, &response)
 
+	err := c.PostAndMarshal(path.Join("firewall/alias/delItem", uuid.String()), nil, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.Result != deleted {
-		err := fmt.Errorf("failed to delete, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasDelete response: %#v", response)
+		return nil, fmt.Errorf("AliasDelete failed: %w", ErrOpnsenseDelete)
 	}
 
 	return &response, nil
@@ -216,16 +209,14 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 	}
 
 	if response.Status != "ok" {
-		err := fmt.Errorf("failed to reconfigure, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasReconfigure response: %#v", response)
+		return nil, fmt.Errorf("AliasReconfigure failed: %w", ErrOpnsenseStatusNotOk)
 	}
 
 	return &response, nil
 }
 
-//// ALIAS UILS SECTION ////
+//// ALIAS UILS SECTION ////.
 type AliasUtilsGet struct {
 	Name     string           `json:"name"`
 	Total    int              `json:"total"`
@@ -250,7 +241,6 @@ func (c *Client) AliasUtilsGet(name string) (*AliasUtilsGet, error) {
 	var response AliasUtilsGet
 
 	err := c.GetAndUnmarshal(path.Join("firewall/alias_util/list", name), &response)
-
 	if err != nil {
 		return nil, err
 	}
@@ -262,17 +252,15 @@ func (c *Client) AliasUtilsGet(name string) (*AliasUtilsGet, error) {
 
 func (c *Client) AliasUtilsAdd(name string, request AliasUtilsSet) (*AliasUtilsResponse, error) {
 	var response AliasUtilsResponse
-	err := c.PostAndMarshal(path.Join("firewall/alias_util/add", name), request, &response)
 
+	err := c.PostAndMarshal(path.Join("firewall/alias_util/add", name), request, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.Status != done {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasUtilsGet response: %#v", response)
+		return nil, fmt.Errorf("AliasUtilsGet failed: %w", ErrOpnsenseDone)
 	}
 
 	return &response, nil
@@ -280,17 +268,15 @@ func (c *Client) AliasUtilsAdd(name string, request AliasUtilsSet) (*AliasUtilsR
 
 func (c *Client) AliasUtilsDel(name string, request AliasUtilsSet) (*AliasUtilsResponse, error) {
 	var response AliasUtilsResponse
-	err := c.PostAndMarshal(path.Join("firewall/alias_util/delete", name), request, &response)
 
+	err := c.PostAndMarshal(path.Join("firewall/alias_util/delete", name), request, &response)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.Status != done {
-		err := fmt.Errorf("failed to save, response from server: %#v", response)
-		log.Printf("[ERROR] %#v\n", err)
-
-		return nil, err
+		log.Printf("[TRACE] AliasUtilsDel response: %#v", response)
+		return nil, fmt.Errorf("AliasUtilsDel failed: %w", ErrOpnsenseDone)
 	}
 
 	return &response, nil
