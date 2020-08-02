@@ -237,6 +237,42 @@ type Selected struct {
 	Selected int    `json:"selected"`
 }
 
+func (s *Selected) UnmarshalJSON(b []byte) error {
+	*s = Selected{}
+
+	type Alias Selected
+
+	var temp Alias
+
+	err := json.Unmarshal(b, &temp)
+	if err != nil {
+		type Selected2 struct {
+			Value    string `json:"value"`
+			Selected bool   `json:"selected"`
+		}
+
+		var temp2 Selected2
+
+		err := json.Unmarshal(b, &temp2)
+		if err != nil {
+			return err
+		}
+
+		s.Value = temp2.Value
+		if temp2.Selected {
+			s.Selected = 1
+		} else {
+			s.Selected = 0
+		}
+
+	}
+
+	s.Value = temp.Value
+	s.Selected = temp.Selected
+
+	return nil
+}
+
 func ListSelectedValues(m SelectedMap) []string {
 	s := []string{}
 
