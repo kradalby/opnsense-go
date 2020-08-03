@@ -12,6 +12,7 @@ func (c *Client) Backup() (string, error) {
 	resp, err := c.Get(api)
 	if err != nil {
 		log.Printf("[ERROR] Failed to download backup: %#v", err)
+
 		return "", err
 	}
 
@@ -20,6 +21,7 @@ func (c *Client) Backup() (string, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
+
 		return "", err
 	}
 

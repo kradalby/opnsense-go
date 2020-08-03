@@ -150,6 +150,7 @@ func (c *Client) BgpNeighborSet(uuid uuid.UUID, clientConf BgpNeighborSet) (*Gen
 
 	if response.Result != saved {
 		log.Printf("[TRACE] BgpNeighborSet response: %#v", response)
+
 		return nil, fmt.Errorf("BgpNeighborSet failed: %w", ErrOpnsenseSave)
 	}
 
@@ -172,6 +173,7 @@ func (c *Client) BgpNeighborAdd(clientConf BgpNeighborSet) (*uuid.UUID, error) {
 
 	if response.Result != saved {
 		log.Printf("[TRACE] BgpNeighborAdd response: %#v", response)
+
 		return nil, fmt.Errorf("BgpNeighborAdd failed: %w", ErrOpnsenseSave)
 	}
 
@@ -190,6 +192,7 @@ func (c *Client) BgpNeighborDelete(uuid uuid.UUID) (*GenericResponse, error) {
 
 	if response.Result != deleted {
 		log.Printf("[TRACE] BgpNeighborDelete response: %#v", response)
+
 		return nil, fmt.Errorf("BgpNeighborDelete failed: %w", ErrOpnsenseDelete)
 	}
 

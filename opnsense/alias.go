@@ -91,6 +91,7 @@ func (c *Client) AliasGet(uuid uuid.UUID) (*AliasFormat, error) {
 	for k, v := range rawResponse.Alias.Type {
 		if v.Selected == 1 && k != "" {
 			response.Type = k
+
 			break
 		}
 	}
@@ -132,6 +133,7 @@ func (c *Client) AliasUpdate(uuid uuid.UUID, conf AliasFormat) (*GenericResponse
 
 	if response.Result != saved {
 		log.Printf("[TRACE] AliasUpdate response: %#v", response)
+
 		return nil, fmt.Errorf("AliasUpdate failed: %w", ErrOpnsenseSave)
 	}
 
@@ -156,6 +158,7 @@ func (c *Client) AliasAdd(conf AliasFormat) (*uuid.UUID, error) {
 
 	if response.Result != saved {
 		log.Printf("[TRACE] AliasAdd response: %#v", response)
+
 		return nil, fmt.Errorf("AliasAdd failed: %w", ErrOpnsenseSave)
 	}
 
@@ -192,6 +195,7 @@ func (c *Client) AliasDelete(uuid uuid.UUID) (*GenericResponse, error) {
 
 	if response.Result != deleted {
 		log.Printf("[TRACE] AliasDelete response: %#v", response)
+
 		return nil, fmt.Errorf("AliasDelete failed: %w", ErrOpnsenseDelete)
 	}
 
@@ -210,6 +214,7 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 
 	if response.Status != "ok" {
 		log.Printf("[TRACE] AliasReconfigure response: %#v", response)
+
 		return nil, fmt.Errorf("AliasReconfigure failed: %w", ErrOpnsenseStatusNotOk)
 	}
 
@@ -260,6 +265,7 @@ func (c *Client) AliasUtilsAdd(name string, request AliasUtilsSet) (*AliasUtilsR
 
 	if response.Status != done {
 		log.Printf("[TRACE] AliasUtilsGet response: %#v", response)
+
 		return nil, fmt.Errorf("AliasUtilsGet failed: %w", ErrOpnsenseDone)
 	}
 
@@ -276,6 +282,7 @@ func (c *Client) AliasUtilsDel(name string, request AliasUtilsSet) (*AliasUtilsR
 
 	if response.Status != done {
 		log.Printf("[TRACE] AliasUtilsDel response: %#v", response)
+
 		return nil, fmt.Errorf("AliasUtilsDel failed: %w", ErrOpnsenseDone)
 	}
 

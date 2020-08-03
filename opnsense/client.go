@@ -86,6 +86,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 	request, err := http.NewRequestWithContext(context.TODO(), "GET", url, nil)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create GET request: %#v\n\n", err)
+
 		return nil, err
 	}
 
@@ -99,6 +100,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	resp, err := c.Get(api)
 	if err != nil {
 		log.Printf("[ERROR] Failed to GET request: %s\n", err)
+
 		return err
 	}
 
@@ -107,12 +109,14 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
+
 		return err
 	}
 
 	// add possible internal error from the OPNSense API
 	if resp.StatusCode == 500 {
 		log.Printf("[ERROR] Internal Error status code received: %#v\n", string(body))
+
 		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense500)
 	}
 
@@ -131,6 +135,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Failed to unmarshal GET response: %#v\n", err)
+
 		return err
 	}
 
@@ -145,6 +150,7 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 	request, err := http.NewRequestWithContext(context.TODO(), "POST", url, body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create POST request: %#v\n", err)
+
 		return nil, err
 	}
 
@@ -158,6 +164,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal requestData for POST request: %#v\n", err)
+
 		return err
 	}
 
@@ -166,6 +173,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 	resp, err := c.Post(api, bytes.NewBuffer(requestBody))
 	if err != nil {
 		log.Printf("[ERROR] Failed to POST request: %#v\n", err)
+
 		return err
 	}
 
@@ -174,6 +182,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read POST response: %#v\n", err)
+
 		return err
 	}
 
