@@ -8,6 +8,15 @@
    "steps": [
       {
          "commands": [
+            "npm install prettier",
+            "npx prettier --check \"**/*.{ts,js,md,yaml,yml,sass,css,scss}\""
+         ],
+         "image": "node:lts",
+         "name": "prettier lint",
+         "pull": "always"
+      },
+      {
+         "commands": [
             "golangci-lint run -v --timeout 10m --tests=false"
          ],
          "image": "golangci/golangci-lint:latest",

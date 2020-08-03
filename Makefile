@@ -29,3 +29,6 @@ vendor:
 
 fmt:
 	golangci-lint run --fix
+
+upgrade:
+	$(GOGET) -t -u ./...
