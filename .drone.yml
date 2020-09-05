@@ -12,7 +12,7 @@
             "npx prettier --check \"**/*.{ts,js,md,yaml,yml,sass,css,scss}\""
          ],
          "image": "node:lts",
-         "name": "prettier lint",
+         "name": "Prettier lint",
          "pull": "always"
       },
       {
@@ -21,6 +21,14 @@
          ],
          "image": "golangci/golangci-lint:latest",
          "name": "Go lint",
+         "pull": "always"
+      },
+      {
+         "commands": [
+            "go test ./..."
+         ],
+         "image": "golang:1.14.4-stretch",
+         "name": "Go test",
          "pull": "always"
       },
       {
