@@ -11,7 +11,7 @@ import (
 // Requires: os-frr.
 
 type BGP struct {
-	Enabled   string    `json:"enabled"`
+	Enabled   Bool      `json:"enabled"`
 	Asnumber  string    `json:"asnumber"`
 	Routerid  string    `json:"routerid"`
 	Neighbors Neighbors `json:"neighbors"`
@@ -34,10 +34,10 @@ type Neighbors struct {
 
 type BgpNeighborBase struct {
 	UUID             *uuid.UUID `json:"uuid,omitempty"`
-	Enabled          string     `json:"enabled"`
+	Enabled          Bool       `json:"enabled"`
 	Address          string     `json:"address"`
 	Remoteas         string     `json:"remoteas"`
-	Nexthopself      string     `json:"nexthopself"`
+	Nexthopself      Bool       `json:"nexthopself"`
 	Defaultoriginate string     `json:"defaultoriginate"`
 }
 

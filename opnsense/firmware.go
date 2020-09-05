@@ -160,14 +160,18 @@ func (c *Client) GetInformation() (*Information, error) {
 }
 
 type Package struct {
-	Name      string `json:"name"`
-	Version   string `json:"version"`
-	Comment   string `json:"comment"`
-	Flatsize  string `json:"flatsize"`
-	Locked    string `json:"locked"`
-	License   string `json:"license"`
-	Provided  string `json:"provided"`
-	Installed string `json:"installed"`
+	Name       string `json:"name"`
+	Version    string `json:"version"`
+	Comment    string `json:"comment"`
+	Flatsize   string `json:"flatsize"`
+	Locked     string `json:"locked"`
+	License    string `json:"license"`
+	Repository string `json:"repository"`
+	Origin     string `json:"origin"`
+	Provided   Bool   `json:"provided"`
+	Installed  Bool   `json:"installed"`
+	Path       string `json:"path"`
+	Configured Bool   `json:"configured"`
 }
 
 func (c *Client) PackageInstall(packageName string) (*StatusMessage, error) {

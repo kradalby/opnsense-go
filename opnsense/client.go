@@ -31,6 +31,8 @@ var (
 	ErrOpnsenseStatusNotOk       = errors.New("status did not return ok")
 	ErrOpnsenseEmptyListNotFound = errors.New("found empty array, most likely 404")
 	ErrOpnsense500               = errors.New("internal server error")
+	ErrOpnsenseBoolUnmarshal     = errors.New("failed to unmarshal OPNsense bool")
+	ErrOpnsenseBoolMarshal       = errors.New("failed to marshal OPNsense bool")
 )
 
 type Client struct {
@@ -313,4 +315,30 @@ func ListSelectedKeys(m SelectedMap) []string {
 	}
 
 	return s
+}
+
+type Bool bool
+
+func (bit *Bool) UnmarshalJSON(b []byte) error {
+	var txt string
+
+	err := json.Unmarshal(b, &txt)
+	if err != nil {
+		return err
+	}
+
+	*bit = Bool(txt == "1" || txt == "true")
+
+	return nil
+}
+
+func (bit Bool) MarshalJSON() ([]byte, error) {
+	switch bit {
+	case true:
+		return []byte("1"), nil
+	case false:
+		return []byte("0"), nil
+	}
+
+	return nil, ErrOpnsenseBoolMarshal
 }
