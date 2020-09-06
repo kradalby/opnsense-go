@@ -32,6 +32,7 @@ var (
 	ErrOpnsenseStatusNotOk       = errors.New("status did not return ok")
 	ErrOpnsenseEmptyListNotFound = errors.New("found empty array, most likely 404")
 	ErrOpnsense500               = errors.New("internal server error")
+	ErrOpnsense401               = errors.New("authentication failed")
 	ErrOpnsenseBoolUnmarshal     = errors.New("failed to unmarshal OPNsense bool")
 	ErrOpnsenseBoolMarshal       = errors.New("failed to marshal OPNsense bool")
 )
@@ -123,6 +124,12 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense500)
 	}
 
+	if resp.StatusCode == 401 {
+		log.Printf("[ERROR] Failed to authenticate: %#v\n", string(body))
+
+		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense401)
+	}
+
 	// The OPNsense API does not return 404 when you fetch something that does
 	// not exist, but returns an empty list instead. Check for the empty list
 	// and return a 404 error instead so implmenters could handle that error
@@ -187,6 +194,12 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 		log.Printf("[ERROR] Failed to read POST response: %#v\n", err)
 
 		return err
+	}
+
+	if resp.StatusCode == 401 {
+		log.Printf("[ERROR] Failed to authenticate: %#v\n", string(body))
+
+		return fmt.Errorf("PostAndMarshal failed: %w", ErrOpnsense401)
 	}
 
 	err = json.Unmarshal(body, responseData)
@@ -342,4 +355,12 @@ func (bit Bool) MarshalJSON() ([]byte, error) {
 	}
 
 	return nil, ErrOpnsenseBoolMarshal
+}
+
+func (bit Bool) URLArgument() string {
+	if bit {
+		return "1"
+	}
+
+	return "0"
 }
