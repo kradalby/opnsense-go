@@ -94,7 +94,7 @@ func (c *Client) WireGuardSettingsSet(settings WireGuardSettings) (*GenericRespo
 		return nil, err
 	}
 
-	if response.Result != saved {
+	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardSettingsSet response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardSettingsSet failed: %w", ErrOpnsenseSave)
@@ -227,7 +227,7 @@ func (c *Client) WireGuardClientSet(uuid uuid.UUID, clientConf WireGuardClientSe
 		return nil, err
 	}
 
-	if response.Result != saved {
+	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardClientSet response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardClientSet failed: %w", ErrOpnsenseSave)
@@ -250,7 +250,7 @@ func (c *Client) WireGuardClientAdd(clientConf WireGuardClientSet) (*uuid.UUID, 
 		return nil, err
 	}
 
-	if response.Result != saved {
+	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardClientAdd response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardClientAdd failed: %w", ErrOpnsenseSave)
@@ -269,7 +269,7 @@ func (c *Client) WireGuardClientDelete(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Result != deleted {
+	if response.Result != StatusDeleted {
 		log.Printf("[TRACE] WireGuardClientDelete response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardClientDelete failed: %w", ErrOpnsenseDelete)
@@ -403,7 +403,7 @@ func (c *Client) WireGuardServerSet(uuid uuid.UUID, serverConf WireGuardServerSe
 		return nil, err
 	}
 
-	if response.Result != saved {
+	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardServerSet response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardServerSet failed: %w", ErrOpnsenseSave)
@@ -426,7 +426,7 @@ func (c *Client) WireGuardServerAdd(serverConf WireGuardServerSet) error {
 		return err
 	}
 
-	if response.Result != saved {
+	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardServerAdd response: %#v", response)
 
 		return fmt.Errorf("WireGuardServerAdd failed: %w", ErrOpnsenseSave)
@@ -445,7 +445,7 @@ func (c *Client) WireGuardServerDelete(uuid uuid.UUID) (*GenericResponse, error)
 		return nil, err
 	}
 
-	if response.Result != deleted {
+	if response.Result != StatusDeleted {
 		log.Printf("[TRACE] WireGuardServerDelete response: %#v", response)
 
 		return nil, fmt.Errorf("WireGuardServerDelete failed: %w", ErrOpnsenseDelete)

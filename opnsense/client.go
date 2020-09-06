@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	saved   = "saved"
-	deleted = "deleted"
-	done    = "done"
+	StatusSaved   = "saved"
+	StatusDeleted = "deleted"
+	StatusDone    = "done"
+	StatusRunning = "running"
 )
 
 var (
