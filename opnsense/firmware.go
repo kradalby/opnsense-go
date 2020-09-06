@@ -39,6 +39,24 @@ func (c *Client) Upgrade() (*StatusMessage, error) {
 	return &status, nil
 }
 
+type UpgradeStatusMessage struct {
+	Status string `json:"status"`
+	Log    string `json:"log"`
+}
+
+func (c *Client) UpgradeStatus() (*UpgradeStatusMessage, error) {
+	api := "core/firmware/upgradestatus"
+
+	var status UpgradeStatusMessage
+
+	err := c.PostAndMarshal(api, nil, &status)
+	if err != nil {
+		return nil, err
+	}
+
+	return &status, nil
+}
+
 func (c *Client) Audit() (*StatusMessage, error) {
 	api := "core/firmware/audit"
 
@@ -142,12 +160,18 @@ func (c *Client) GetUpgradeStatus() (*UpgradeStatus, error) {
 	return &status, err
 }
 
+type ChangeLog struct {
+	Series  string `json:"series"`
+	Version string `json:"version"`
+	Date    string `json:"date"`
+}
+
 type Information struct {
-	ProductVersion string    `json:"product_version"`
-	ProductName    string    `json:"product_name"`
-	Package        []Package `json:"package"`
-	Plugin         []Package `json:"plugin"`
-	Changelog      []string  `json:"changelog"`
+	ProductVersion string      `json:"product_version"`
+	ProductName    string      `json:"product_name"`
+	Package        []Package   `json:"package"`
+	Plugin         []Package   `json:"plugin"`
+	Changelog      []ChangeLog `json:"changelog"`
 }
 
 func (c *Client) GetInformation() (*Information, error) {
