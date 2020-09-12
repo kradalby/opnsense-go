@@ -212,7 +212,7 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 		return nil, err
 	}
 
-	if response.Status != "ok" {
+	if response.Status != StatusOK {
 		log.Printf("[TRACE] AliasReconfigure response: %#v", response)
 
 		return nil, fmt.Errorf("AliasReconfigure failed: %w", ErrOpnsenseStatusNotOk)

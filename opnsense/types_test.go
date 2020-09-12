@@ -1,9 +1,93 @@
 package opnsense
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
+
+type SampleStruct struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}
+
+type EmbededStruct struct {
+	FieldStruct `json:"field"`
+	Hello       string `json:"hello"`
+}
+
+type FieldStruct struct {
+	OnePoint string        `json:"one_point"`
+	Sample   *SampleStruct `json:"sample"`
+}
+
+func TestStructToMap_Normal(t *testing.T) {
+	sample := SampleStruct{
+		Name: "John Doe",
+		ID:   "12121",
+	}
+
+	res := StructToMap(sample)
+	require.NotNil(t, res)
+
+	fmt.Printf("%+v \n", res)
+	// Output: map[name:John Doe id:12121]
+	jbyt, err := json.Marshal(res)
+	require.NoError(t, err)
+	fmt.Println(string(jbyt))
+	// Output: {"id":"12121","name":"John Doe"}
+}
+func TestStructToMap_FieldStruct(t *testing.T) {
+
+	sample := &SampleStruct{
+		Name: "John Doe",
+		ID:   "12121",
+	}
+	field := FieldStruct{
+		Sample:   sample,
+		OnePoint: "yuhuhuu",
+	}
+
+	res := StructToMap(field)
+	require.NotNil(t, res)
+	fmt.Printf("%+v \n", res)
+	// Output: map[sample:0xc4200f04a0 one_point:yuhuhuu]
+	jbyt, err := json.Marshal(res)
+	require.NoError(t, err)
+	fmt.Println(string(jbyt))
+	// Output: {"one_point":"yuhuhuu","sample":{"name":"John Doe","id":"12121"}}
+
+}
+
+func TestStructToMap_EmbeddedStruct(t *testing.T) {
+
+	sample := &SampleStruct{
+		Name: "John Doe",
+		ID:   "12121",
+	}
+	field := FieldStruct{
+		Sample:   sample,
+		OnePoint: "yuhuhuu",
+	}
+
+	embed := EmbededStruct{
+		FieldStruct: field,
+		Hello:       "WORLD!!!!",
+	}
+
+	res := StructToMap(embed)
+	require.NotNil(t, res)
+	fmt.Printf("%+v \n", res)
+	//Output: map[field:map[one_point:yuhuhuu sample:0xc420106420] hello:WORLD!!!!]
+
+	jbyt, err := json.Marshal(res)
+	require.NoError(t, err)
+	fmt.Println(string(jbyt))
+	// Output: {"field":{"one_point":"yuhuhuu","sample":{"name":"John Doe","id":"12121"}},"hello":"WORLD!!!!"}
+}
 
 func TestSelectedMap_UnmarshalJSON(t *testing.T) {
 	type args struct {
@@ -245,5 +329,126 @@ func TestBool_UnmarshalJSON(t *testing.T) {
 				t.Errorf("Bool.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func TestPortRangeUnmarshal(t *testing.T) {
+	type c struct {
+		input    string
+		expected PortRange
+	}
+
+	type wrap struct {
+		Range PortRange `json:"range"`
+	}
+
+	validRanges := []c{
+		{
+			input: "{\"range\": \"20-20\"}",
+			expected: PortRange{
+				From: 20,
+				To:   20,
+			},
+		},
+		{
+			input: "{\"range\": \"20-80\"}",
+			expected: PortRange{
+				From: 20,
+				To:   80,
+			},
+		},
+		{
+			input: "{\"range\": \"1-65535\"}",
+			expected: PortRange{
+				From: 1,
+				To:   65535,
+			},
+		},
+	}
+	invalidRanges := []string{
+		"{\"range\": \"80-20\"}",
+		"{\"range\": \"-20-20\"}",
+		"{\"range\": \"-20\"}",
+		"{\"range\": \"-80\"}",
+		"{\"range\": \"-0\"}",
+		"{\"range\": \"-65536\"}",
+		"{\"range\": \"999999-9999999\"}",
+	}
+
+	for _, valid := range validRanges {
+		w := wrap{}
+
+		err := json.Unmarshal([]byte(valid.input), &w)
+		if err != nil {
+			t.Errorf("Expected valid result from %s, error: %s", valid.input, err)
+		}
+
+		if w.Range != valid.expected {
+			t.Errorf("Actual does not match expected: %v vs %v", w.Range, valid.expected)
+		}
+	}
+
+	for _, invalid := range invalidRanges {
+		w := wrap{}
+
+		err := json.Unmarshal([]byte(invalid), &w)
+		if err == nil {
+			t.Errorf("Expected error and an invalid outout %s, %s", invalid, err)
+		}
+
+		fmt.Printf("from: %d, to: %d\n", w.Range.From, w.Range.To)
+	}
+}
+
+func TestPortValid(t *testing.T) {
+	valids := []Port{1, 2, 3, 66, 9999, 65535}
+	invalids := []Port{0, 65536, 99999999}
+
+	for _, valid := range valids {
+		if !valid.Valid() {
+			t.Errorf("Expected valid port: %d", valid)
+		}
+	}
+
+	for _, invalid := range invalids {
+		if invalid.Valid() {
+			t.Errorf("Expected invalid port: %d", invalid)
+		}
+	}
+}
+
+func TestPortFromString(t *testing.T) {
+	valids := []string{"1", "2", "3", "66", "9999", "65535"}
+	invalids := []string{"", "asdf", "7a", "0", "65536", "99999999"}
+
+	for _, valid := range valids {
+		_, err := portFromString(valid)
+		if err != nil {
+			t.Errorf("Expected valid port: %s, %s", valid, err)
+		}
+	}
+
+	for _, invalid := range invalids {
+		val, err := portFromString(invalid)
+		if err == nil {
+			t.Errorf("Expected invalid port: %s, returned: %d", invalid, val)
+		}
+	}
+}
+
+func TestPortRangeMarshal(t *testing.T) {
+	pr := PortRange{
+		From: 22,
+		To:   23,
+	}
+	expected := "\"22-23\""
+
+	actual, err := json.Marshal(&pr)
+	if err != nil {
+		t.Errorf("Failed to marshal: %s", err)
+	}
+
+	if string(actual) != expected {
+		t.Errorf("Actual is not the same as expected, %s != %s", actual, expected)
 	}
 }
