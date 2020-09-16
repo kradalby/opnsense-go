@@ -212,7 +212,7 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 		return nil, err
 	}
 
-	if response.Status != "ok" {
+	if response.Status != StatusOK {
 		log.Printf("[TRACE] AliasReconfigure response: %#v", response)
 
 		return nil, fmt.Errorf("AliasReconfigure failed: %w", ErrOpnsenseStatusNotOk)
@@ -221,7 +221,7 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 	return &response, nil
 }
 
-//// ALIAS UILS SECTION ////.
+// ALIAS UTILS SECTION.
 type AliasUtilsGet struct {
 	Name     string           `json:"name"`
 	Total    int              `json:"total"`
