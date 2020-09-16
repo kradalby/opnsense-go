@@ -16,7 +16,7 @@ import (
 // TODO: Save/Apply function that handles save, check if we locked out, roll back or cancel rollback
 
 // I think apply will make the changes live, and then revert back to rollbackRevision
-// after 60s if not FirewallFilterCancelRollback is called with rollbackRevision
+// after 60s if not FirewallFilterCancelRollback is called with rollbackRevision.
 type ApplyStatus struct {
 	Status string `json:"status"`
 }
@@ -127,8 +127,8 @@ func (c *Client) FirewallFilterRuleGet(uuid uuid.UUID) (*FilterRule, error) {
 	return &response.Rule, nil
 }
 
-func (c *Client) FirewallFilterRuleSet(uuid uuid.UUID, rule FilterRule) (*GenericResponse, error) {
-	api := path.Join("firewall/filter/setRule", uuid.String())
+func (c *Client) FirewallFilterRuleSet(rule *FilterRule) error {
+	api := path.Join("firewall/filter/setRule", rule.UUID.String())
 
 	request := map[string]interface{}{
 		"rule": rule,
@@ -138,19 +138,19 @@ func (c *Client) FirewallFilterRuleSet(uuid uuid.UUID, rule FilterRule) (*Generi
 
 	err := c.PostAndMarshal(api, request, &response)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if response.Result != StatusSaved {
-		log.Printf("[TRACE] WireGuardServerSet response: %#v", response)
+		log.Printf("[TRACE] FirewallFilterRuleSet response: %#v", response)
 
-		return nil, fmt.Errorf("WireGuardServerSet failed: %w", ErrOpnsenseSave)
+		return fmt.Errorf("FirewallFilterRuleSet failed: %w", ErrOpnsenseSave)
 	}
 
-	return &response, nil
+	return nil
 }
 
-func (c *Client) FirewallFilterRuleAdd(rule FilterRule) error {
+func (c *Client) FirewallFilterRuleAdd(rule *FilterRule) error {
 	api := "firewall/filter/addRule"
 
 	var response GenericResponse
@@ -173,23 +173,23 @@ func (c *Client) FirewallFilterRuleAdd(rule FilterRule) error {
 	return nil
 }
 
-func (c *Client) FirewallFilterRuleDelete(uuid uuid.UUID) (*GenericResponse, error) {
+func (c *Client) FirewallFilterRuleDelete(uuid uuid.UUID) error {
 	api := path.Join("firewall/filter/delRule", uuid.String())
 
 	var response GenericResponse
 
 	err := c.PostAndMarshal(api, nil, &response)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if response.Result != StatusDeleted {
 		log.Printf("[TRACE] FirewallFilterRuleDelete response: %#v", response)
 
-		return nil, fmt.Errorf("FirewallFilterRuleDelete failed: %w", ErrOpnsenseDelete)
+		return fmt.Errorf("FirewallFilterRuleDelete failed: %w", ErrOpnsenseDelete)
 	}
 
-	return &response, nil
+	return nil
 }
 
 func (c *Client) FirewallFilterRuleSearch() ([]*FilterRule, error) {

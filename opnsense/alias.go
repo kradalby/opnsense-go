@@ -221,7 +221,7 @@ func (c *Client) AliasReconfigure() (*AliasReconfigureResponse, error) {
 	return &response, nil
 }
 
-//// ALIAS UILS SECTION ////.
+// ALIAS UTILS SECTION.
 type AliasUtilsGet struct {
 	Name     string           `json:"name"`
 	Total    int              `json:"total"`

@@ -31,8 +31,29 @@ var (
 	ErrOpnsenseInvalidPortRangeToSmallerThanFrom = errors.New("port range is invalid, to smaller than from")
 )
 
+func JSONFields(b interface{}) []string {
+	fields := []string{}
+	val := reflect.ValueOf(b)
+
+	for i := 0; i < val.Type().NumField(); i++ {
+		t := val.Type().Field(i)
+		fieldName := t.Name
+
+		if jsonTag := t.Tag.Get("json"); jsonTag != "" && jsonTag != "-" {
+			if commaIdx := strings.Index(jsonTag, ","); commaIdx > 0 {
+				fieldName = jsonTag[:commaIdx]
+			}
+		}
+
+		fields = append(fields, fieldName)
+	}
+
+	return fields
+}
+
 /*
-This function will help you to convert your object from struct to map[string]interface{} based on your JSON tag in your structs.
+This function will help you to convert your object from struct to
+map[string]interface{} based on your JSON tag in your structs.
 https://gist.github.com/bxcodec/c2a25cfc75f6b21a0492951706bc80b8
 */
 func StructToMap(item interface{}) map[string]interface{} {
@@ -235,6 +256,7 @@ func (bit *Integer) UnmarshalJSON(b []byte) error {
 
 func (bit Integer) MarshalJSON() ([]byte, error) {
 	str := strconv.Itoa(int(bit))
+
 	return []byte(str), nil
 }
 
@@ -245,8 +267,6 @@ func (p Port) Valid() bool {
 }
 
 func portFromString(portStr string) (Port, error) {
-	// var digitCheck = regexp.MustCompile(`^[0-9]+$`)
-
 	number, err := strconv.Atoi(portStr)
 	if err != nil {
 		return 0, err
