@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,25 +15,6 @@ import (
 
 	"github.com/gobuffalo/envy"
 	uuid "github.com/satori/go.uuid"
-)
-
-const (
-	StatusSaved   = "saved"
-	StatusDeleted = "deleted"
-	StatusDone    = "done"
-	StatusRunning = "running"
-)
-
-var (
-	ErrOpnsenseSave              = errors.New("failed to save")
-	ErrOpnsenseDelete            = errors.New("failed to delete")
-	ErrOpnsenseDone              = errors.New("did not finish")
-	ErrOpnsenseStatusNotOk       = errors.New("status did not return ok")
-	ErrOpnsenseEmptyListNotFound = errors.New("found empty array, most likely 404")
-	ErrOpnsense500               = errors.New("internal server error")
-	ErrOpnsense401               = errors.New("authentication failed")
-	ErrOpnsenseBoolUnmarshal     = errors.New("failed to unmarshal OPNsense bool")
-	ErrOpnsenseBoolMarshal       = errors.New("failed to marshal OPNsense bool")
 )
 
 type Client struct {
@@ -53,17 +33,19 @@ func NewClient(baseURL, key, secret string, insecureSkipVerify bool) (*Client, e
 		insecureSkipVerify,
 	)
 
+	allowInsecure := getEnvAsBool("OPNSENSE_ALLOW_UNVERIFIED_TLS", insecureSkipVerify)
+
 	httpClient := &http.Client{
 		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
 			/* #nosec */
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: insecureSkipVerify,
+				InsecureSkipVerify: allowInsecure,
 			},
 		},
 	}
 
-	url, err := url.Parse(baseURL)
+	url, err := url.Parse(envy.Get("OPNSENSE_URL", baseURL))
 	if err != nil {
 		return nil, err
 	}
@@ -196,6 +178,8 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 		return err
 	}
 
+	log.Println("[TEMP]: ", string(body))
+
 	if resp.StatusCode == 401 {
 		log.Printf("[ERROR] Failed to authenticate: %#v\n", string(body))
 
@@ -233,134 +217,8 @@ type SearchResult struct {
 	Current  int           `json:"current"`
 }
 
-// Helpers.
-type SelectedMap map[string]Selected
-
-// The OPNsense API returns a [] when there is no
-// objects in the list of selected items. This is
-// very inconvinient and this function tries to work
-// around this by making the map pointer an empty map
-// if the there is an empty array.
-func (sm *SelectedMap) UnmarshalJSON(b []byte) error {
-	*sm = SelectedMap{}
-
-	type Alias SelectedMap
-
-	var temp2 Alias
-
-	err := json.Unmarshal(b, &temp2)
-	if err != nil {
-		var temp []string
-
-		err := json.Unmarshal(b, &temp)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	for key, value := range temp2 {
-		(*sm)[key] = value
-	}
-
-	return nil
-}
-
-type Selected struct {
-	Value    string `json:"value"`
-	Selected int    `json:"selected"`
-}
-
-func (s *Selected) UnmarshalJSON(b []byte) error {
-	*s = Selected{}
-
-	type Alias Selected
-
-	var temp Alias
-
-	err := json.Unmarshal(b, &temp)
-	if err != nil {
-		type Selected2 struct {
-			Value    string `json:"value"`
-			Selected bool   `json:"selected"`
-		}
-
-		var temp2 Selected2
-
-		err := json.Unmarshal(b, &temp2)
-		if err != nil {
-			return err
-		}
-
-		s.Value = temp2.Value
-		if temp2.Selected {
-			s.Selected = 1
-		} else {
-			s.Selected = 0
-		}
-	}
-
-	s.Value = temp.Value
-	s.Selected = temp.Selected
-
-	return nil
-}
-
-func ListSelectedValues(m SelectedMap) []string {
-	s := []string{}
-
-	for _, value := range m {
-		if value.Selected == 1 {
-			s = append(s, value.Value)
-		}
-	}
-
-	return s
-}
-
-func ListSelectedKeys(m SelectedMap) []string {
-	s := []string{}
-
-	for key, value := range m {
-		if value.Selected == 1 {
-			s = append(s, key)
-		}
-	}
-
-	return s
-}
-
-type Bool bool
-
-func (bit *Bool) UnmarshalJSON(b []byte) error {
-	var txt string
-
-	err := json.Unmarshal(b, &txt)
-	if err != nil {
-		return err
-	}
-
-	*bit = Bool(txt == "1" || txt == "true")
-
-	return nil
-}
-
-func (bit Bool) MarshalJSON() ([]byte, error) {
-	switch bit {
-	case true:
-		return []byte("1"), nil
-	case false:
-		return []byte("0"), nil
-	}
-
-	return nil, ErrOpnsenseBoolMarshal
-}
-
-func (bit Bool) URLArgument() string {
-	if bit {
-		return "1"
-	}
-
-	return "0"
+type SearchResultPartial struct {
+	RowCount int `json:"rowCount"`
+	Total    int `json:"total"`
+	Current  int `json:"current"`
 }

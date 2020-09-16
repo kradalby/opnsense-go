@@ -1,5 +1,10 @@
 package opnsense
 
+import (
+	"fmt"
+	"log"
+)
+
 func (c *Client) PowerOff() (*StatusMessage, error) {
 	api := "core/firmware/poweroff"
 
@@ -76,7 +81,7 @@ type FirmwareConfig struct {
 	Type    string `json:"type"`
 }
 
-func (c *Client) GetFirmwareConfig() (*FirmwareConfig, error) {
+func (c *Client) FirmwareConfigGet() (*FirmwareConfig, error) {
 	api := "core/firmware/getfirmwareconfig"
 
 	var firmwareConfig FirmwareConfig
@@ -85,7 +90,7 @@ func (c *Client) GetFirmwareConfig() (*FirmwareConfig, error) {
 	return &firmwareConfig, err
 }
 
-func (c *Client) SetFirmwareConfig(config FirmwareConfig) (*StatusMessage, error) {
+func (c *Client) FirmwareConfigSet(config FirmwareConfig) (*StatusMessage, error) {
 	api := "core/firmware/setfirmwareconfig"
 
 	var status StatusMessage
@@ -106,7 +111,7 @@ type FirmwareOptions struct {
 	AllowCustom     bool                `json:"allow_custom"`
 }
 
-func (c *Client) GetFirmwareOptions() (*FirmwareOptions, error) {
+func (c *Client) FirmwareOptionsGet() (*FirmwareOptions, error) {
 	api := "core/firmware/getfirmwareoptions"
 
 	var firmwareOptions FirmwareOptions
@@ -137,7 +142,7 @@ type Status struct {
 	Status              string   `json:"status"`
 }
 
-func (c *Client) GetStatus() (*Status, error) {
+func (c *Client) FirmwareStatus() (*Status, error) {
 	api := "core/firmware/status"
 
 	var status Status
@@ -151,7 +156,7 @@ type UpgradeStatus struct {
 	Log    string `json:"log"`
 }
 
-func (c *Client) GetUpgradeStatus() (*UpgradeStatus, error) {
+func (c *Client) FirmwareUpgradeStatus() (*UpgradeStatus, error) {
 	api := "core/firmware/upgradestatus"
 
 	var status UpgradeStatus
@@ -174,7 +179,7 @@ type Information struct {
 	Changelog      []ChangeLog `json:"changelog"`
 }
 
-func (c *Client) GetInformation() (*Information, error) {
+func (c *Client) FirmwareInformation() (*Information, error) {
 	api := "core/firmware/info"
 
 	var information Information
@@ -198,72 +203,119 @@ type Package struct {
 	Configured Bool   `json:"configured"`
 }
 
-func (c *Client) PackageInstall(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareInstalledPluginsList() ([]Package, error) {
+	info, err := c.FirmwareInformation()
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]Package, 0)
+
+	for _, plugin := range info.Plugin {
+		if plugin.Installed {
+			list = append(list, plugin)
+		}
+	}
+
+	return list, nil
+}
+
+func (c *Client) FirmwareInstall(packageName string) error {
 	api := "core/firmware/install/" + packageName
 
 	var status StatusMessage
 
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &status, nil
+	if status.Status != StatusOK {
+		log.Printf("[TRACE] FirmwareInstall response: %#v", status)
+
+		return fmt.Errorf("FirmwareInstall failed: %w", ErrOpnsenseStatusNotOk)
+	}
+
+	return nil
 }
 
-func (c *Client) PackageReInstall(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareReInstall(packageName string) error {
 	api := "core/firmware/reinstall/" + packageName
 
 	var status StatusMessage
 
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &status, nil
+	if status.Status != StatusOK {
+		log.Printf("[TRACE] FirmwareReInstall response: %#v", status)
+
+		return fmt.Errorf("FirmwareReInstall failed: %w", ErrOpnsenseStatusNotOk)
+	}
+
+	return nil
 }
 
-func (c *Client) PackageRemove(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareRemove(packageName string) error {
 	api := "core/firmware/remove/" + packageName
 
 	var status StatusMessage
 
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &status, nil
+	if status.Status != StatusOK {
+		log.Printf("[TRACE] FirmwareRemove response: %#v", status)
+
+		return fmt.Errorf("FirmwareRemove failed: %w", ErrOpnsenseStatusNotOk)
+	}
+
+	return nil
 }
 
-func (c *Client) PackageLock(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareLock(packageName string) error {
 	api := "core/firmware/lock/" + packageName
 
 	var status StatusMessage
 
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &status, nil
+	if status.Status != StatusOK {
+		log.Printf("[TRACE] FirmwareLock response: %#v", status)
+
+		return fmt.Errorf("FirmwareLock failed: %w", ErrOpnsenseStatusNotOk)
+	}
+
+	return nil
 }
 
-func (c *Client) PackageUnlock(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareUnlock(packageName string) error {
 	api := "core/firmware/unlock/" + packageName
 
 	var status StatusMessage
 
 	err := c.PostAndMarshal(api, nil, &status)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &status, nil
+	if status.Status != StatusOK {
+		log.Printf("[TRACE] FirmwareUnlock response: %#v", status)
+
+		return fmt.Errorf("FirmwareUnlock failed: %w", ErrOpnsenseStatusNotOk)
+	}
+
+	return nil
 }
 
-func (c *Client) PackageDetails(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareDetails(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/details/" + packageName
 
 	var status StatusMessage
@@ -276,7 +328,7 @@ func (c *Client) PackageDetails(packageName string) (*StatusMessage, error) {
 	return &status, nil
 }
 
-func (c *Client) PackageLicense(packageName string) (*StatusMessage, error) {
+func (c *Client) FirmwareLicense(packageName string) (*StatusMessage, error) {
 	api := "core/firmware/license/" + packageName
 
 	var status StatusMessage
