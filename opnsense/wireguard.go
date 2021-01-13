@@ -230,7 +230,7 @@ func (c *Client) WireGuardClientSet(uuid uuid.UUID, clientConf WireGuardClientSe
 	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardClientSet response: %#v", response)
 
-		return nil, fmt.Errorf("WireGuardClientSet failed: %w", ErrOpnsenseSave)
+		return nil, fmt.Errorf("WireGuardClientSet failed, validations: %#v: %w", response.Validations, ErrOpnsenseSave)
 	}
 
 	return &response, nil
@@ -253,7 +253,7 @@ func (c *Client) WireGuardClientAdd(clientConf WireGuardClientSet) (*uuid.UUID, 
 	if response.Result != StatusSaved {
 		log.Printf("[TRACE] WireGuardClientAdd response: %#v", response)
 
-		return nil, fmt.Errorf("WireGuardClientAdd failed: %w", ErrOpnsenseSave)
+		return nil, fmt.Errorf("WireGuardClientAdd failed, validations: %#v: %w", response.Validations, ErrOpnsenseSave)
 	}
 
 	return response.UUID, nil

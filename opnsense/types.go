@@ -3,7 +3,7 @@ package opnsense
 import (
 	"encoding/json"
 	"errors"
-	"reflect"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -30,78 +30,6 @@ var (
 	ErrOpnsenseInvalidPortRange                  = errors.New("port range is invalid")
 	ErrOpnsenseInvalidPortRangeToSmallerThanFrom = errors.New("port range is invalid, to smaller than from")
 )
-
-func JSONFields(b interface{}) []string {
-	fields := []string{}
-	val := reflect.ValueOf(b)
-
-	for i := 0; i < val.Type().NumField(); i++ {
-		t := val.Type().Field(i)
-		fieldName := t.Name
-
-		if jsonTag := t.Tag.Get("json"); jsonTag != "" && jsonTag != "-" {
-			if commaIdx := strings.Index(jsonTag, ","); commaIdx > 0 {
-				fieldName = jsonTag[:commaIdx]
-			}
-		}
-
-		fields = append(fields, fieldName)
-	}
-
-	return fields
-}
-
-/*
-This function will help you to convert your object from struct to
-map[string]interface{} based on your JSON tag in your structs.
-https://gist.github.com/bxcodec/c2a25cfc75f6b21a0492951706bc80b8
-*/
-func StructToMap(item interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
-
-	if item == nil {
-		return res
-	}
-
-	v := reflect.TypeOf(item)
-	reflectValue := reflect.ValueOf(item)
-	reflectValue = reflect.Indirect(reflectValue)
-
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	for i := 0; i < v.NumField(); i++ {
-		tag := v.Field(i).Tag.Get("json")
-		field := reflectValue.Field(i).Interface()
-
-		if tag != "" && tag != "-" {
-			if v.Field(i).Type.Kind() == reflect.Struct {
-				res[tag] = StructToMap(field)
-			} else {
-				res[tag] = field
-			}
-		}
-	}
-
-	return res
-}
-
-func StructToMap2(data interface{}) (map[string]interface{}, error) {
-	dataBytes, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-
-	mapData := make(map[string]interface{})
-
-	err = json.Unmarshal(dataBytes, &mapData)
-	if err != nil {
-		return nil, err
-	}
-
-	return mapData, nil
-}
 
 type SelectedMap map[string]Selected
 
@@ -205,9 +133,18 @@ type Bool bool
 func (bit *Bool) UnmarshalJSON(b []byte) error {
 	var txt string
 
+	var boo bool
+
 	err := json.Unmarshal(b, &txt)
 	if err != nil {
-		return err
+		err2 := json.Unmarshal(b, &boo)
+		if err2 != nil {
+			return err
+		}
+
+		*bit = Bool(boo)
+
+		return nil
 	}
 
 	*bit = Bool(txt == "1" || txt == "true")
@@ -291,7 +228,20 @@ func (pr *PortRange) UnmarshalJSON(b []byte) error {
 
 	portRange := PortRange{}
 
-	err := json.Unmarshal(b, &txt)
+	var singlePort Port
+
+	err := json.Unmarshal(b, &singlePort)
+	fmt.Printf("PortRange unmarsh err: %s", err)
+	if err == nil {
+		if singlePort.Valid() {
+			portRange.From = singlePort
+			portRange.To = singlePort
+
+			*pr = portRange
+		}
+	}
+
+	err = json.Unmarshal(b, &txt)
 	if err != nil {
 		return err
 	}
@@ -341,3 +291,5 @@ type NetworkOrAlias string
 type Protocol string
 
 type Interface string
+
+type Option string

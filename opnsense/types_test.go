@@ -342,6 +342,13 @@ func TestPortRangeUnmarshal(t *testing.T) {
 
 	validRanges := []c{
 		{
+			input: "{\"range\": \"8000\"}",
+			expected: PortRange{
+				From: 8000,
+				To:   8000,
+			},
+		},
+		{
 			input: "{\"range\": \"20-20\"}",
 			expected: PortRange{
 				From: 20,

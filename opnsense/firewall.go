@@ -93,11 +93,11 @@ type FilterRule struct {
 	UUID            *uuid.UUID     `json:"uuid,omitempty"`
 	Enabled         Bool           `json:"enabled,omitempty"`
 	Sequence        Integer        `json:"sequence,omitempty"`
-	Action          SelectedMap    `json:"action,omitempty"`
+	Action          Option         `json:"action,omitempty"`
 	Quick           Bool           `json:"quick,omitempty"`
 	Interface       Interface      `json:"interface,omitempty"` // InterfaceField
-	Direction       SelectedMap    `json:"direction,omitempty"`
-	IPProtocol      SelectedMap    `json:"ipprotocol,omitempty"`
+	Direction       Option         `json:"direction,omitempty"`
+	IPProtocol      Option         `json:"ipprotocol,omitempty"`
 	Protocol        Protocol       `json:"protocol,omitempty"`   // ProtocolField
 	SourceNet       NetworkOrAlias `json:"source_net,omitempty"` // NetworkAliasField
 	SourceNot       Bool           `json:"source_not,omitempty"`
@@ -163,6 +163,8 @@ func (c *Client) FirewallFilterRuleAdd(rule *FilterRule) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("Add: %#v", response)
 
 	if response.Result != StatusSaved {
 		log.Printf("[TRACE] FirewallFilterRuleAdd response: %#v", response)

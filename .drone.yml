@@ -1,101 +1,85 @@
 ---
 {
-   "kind": "pipeline",
-   "name": "Kubernetes",
-   "node_selector": {
-      "drone": true
-   },
-   "steps": [
+  "dns_config": { "nameservers": ["1.1.1.1", "1.0.0.1"] },
+  "kind": "pipeline",
+  "name": "Kubernetes",
+  "node_selector": { "drone": true },
+  "platform": { "arch": "amd64", "os": "linux" },
+  "steps":
+    [
       {
-         "commands": [
+        "commands":
+          [
             "npm install prettier",
-            "npx prettier --check \"**/*.{ts,js,md,yaml,yml,sass,css,scss}\""
-         ],
-         "image": "node:lts",
-         "name": "Prettier lint",
-         "pull": "always"
+            'npx prettier --check "**/*.{ts,js,md,yaml,yml,sass,css,scss}"',
+          ],
+        "image": "node:lts-buster",
+        "name": "Prettier lint",
+        "pull": "always",
       },
       {
-         "commands": [
-            "golangci-lint run -v --timeout 10m"
-         ],
-         "image": "golangci/golangci-lint:latest",
-         "name": "Go lint",
-         "pull": "always"
+        "commands":
+          [
+            "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin",
+            "golangci-lint run -v --timeout 10m",
+          ],
+        "image": "golang:1.15-buster",
+        "name": "Go lint",
+        "pull": "always",
       },
       {
-         "commands": [
-            "go test ./..."
-         ],
-         "image": "golang:1.14.4-stretch",
-         "name": "Go test",
-         "pull": "always"
+        "commands": ["go test ./..."],
+        "image": "golang:1.15-buster",
+        "name": "Go test",
+        "pull": "always",
       },
       {
-         "commands": [
+        "commands":
+          [
             "go get github.com/mitchellh/gox",
-            "gox -output=\"dist/{{.Dir}}_{{.OS}}_{{.Arch}}\""
-         ],
-         "image": "golang:1.14.4-stretch",
-         "name": "Go build",
-         "pull": "always"
+            'gox -osarch "!darwin/386" -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}"',
+          ],
+        "image": "golang:1.15-buster",
+        "name": "Go build",
+        "pull": "always",
       },
       {
-         "image": "drillster/drone-email",
-         "name": "Email",
-         "pull": "always",
-         "settings": {
+        "image": "drillster/drone-email",
+        "name": "Email",
+        "pull": "always",
+        "settings":
+          {
             "from": "drone@drone.fap.no",
             "host": "smtp.fap.no",
             "port": 25,
-            "skip_verify": true
-         },
-         "when": {
-            "status": [
-               "success",
-               "failure"
-            ]
-         }
+            "skip_verify": true,
+          },
+        "when": { "status": ["success", "failure"] },
       },
       {
-         "image": "appleboy/drone-discord",
-         "name": "Notify Discord",
-         "pull": "always",
-         "settings": {
+        "image": "appleboy/drone-discord",
+        "name": "Notify Discord",
+        "pull": "always",
+        "settings":
+          {
             "message": "{{#success build.status}}\n✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝  Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐  {{ build.link }}\n\n✅  duration: {{duration build.started build.finished}}\n✅  started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}}\n✅  finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}\n\n{{else}}\n@everyone\n❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝  Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐  {{ build.link }}\n\n✅  duration: {{duration build.started build.finished}}\n✅  started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}}\n✅  finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}\n\n{{/success}}\n",
-            "webhook_id": {
-               "from_secret": "discord_webhook_id"
-            },
-            "webhook_token": {
-               "from_secret": "discord_webhook_token"
-            }
-         },
-         "when": {
-            "status": [
-               "success",
-               "failure"
-            ]
-         }
-      }
-   ],
-   "type": "kubernetes"
+            "webhook_id": { "from_secret": "discord_webhook_id" },
+            "webhook_token": { "from_secret": "discord_webhook_token" },
+          },
+        "when": { "status": ["success", "failure"] },
+      },
+    ],
+  "type": "kubernetes",
 }
 ---
 {
-   "get": {
-      "name": "id",
-      "path": "discord-build"
-   },
-   "kind": "secret",
-   "name": "discord_webhook_id"
+  "get": { "name": "id", "path": "discord-build" },
+  "kind": "secret",
+  "name": "discord_webhook_id",
 }
 ---
 {
-   "get": {
-      "name": "token",
-      "path": "discord-build"
-   },
-   "kind": "secret",
-   "name": "discord_webhook_token"
+  "get": { "name": "token", "path": "discord-build" },
+  "kind": "secret",
+  "name": "discord_webhook_token",
 }
-...
