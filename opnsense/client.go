@@ -89,7 +89,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -168,7 +168,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

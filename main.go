@@ -1,3 +1,4 @@
+//go:build !codeanalysis
 // +build !codeanalysis
 
 package main
@@ -14,4 +15,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
