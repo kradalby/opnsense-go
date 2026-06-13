@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -69,7 +68,7 @@ func (c *Client) Get(api string) (resp *http.Response, err error) {
 	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] GET to %s", url)
 
-	request, err := http.NewRequestWithContext(context.TODO(), "GET", url, nil)
+	request, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create GET request: %#v\n\n", err)
 
@@ -92,7 +91,7 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
 
@@ -100,13 +99,13 @@ func (c *Client) GetAndUnmarshal(api string, responseData interface{}) error {
 	}
 
 	// add possible internal error from the OPNSense API
-	if resp.StatusCode == 500 {
+	if resp.StatusCode == http.StatusInternalServerError {
 		log.Printf("[ERROR] Internal Error status code received: %#v\n", string(body))
 
 		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense500)
 	}
 
-	if resp.StatusCode == 401 {
+	if resp.StatusCode == http.StatusUnauthorized {
 		log.Printf("[ERROR] Failed to authenticate: %#v\n", string(body))
 
 		return fmt.Errorf("GetAndUnmarshal failed: %w", ErrOpnsense401)
@@ -139,7 +138,7 @@ func (c *Client) Post(api string, body io.Reader) (resp *http.Response, err erro
 	url := c.baseURL.String() + "/api/" + api
 	log.Printf("[TRACE] POST to %s", url)
 
-	request, err := http.NewRequestWithContext(context.TODO(), "POST", url, body)
+	request, err := http.NewRequestWithContext(context.TODO(), http.MethodPost, url, body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to create POST request: %#v\n", err)
 
@@ -171,7 +170,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read POST response: %#v\n", err)
 
@@ -180,7 +179,7 @@ func (c *Client) PostAndMarshal(api string, requestData interface{}, responseDat
 
 	log.Println("[TEMP]: ", string(body))
 
-	if resp.StatusCode == 401 {
+	if resp.StatusCode == http.StatusUnauthorized {
 		log.Printf("[ERROR] Failed to authenticate: %#v\n", string(body))
 
 		return fmt.Errorf("PostAndMarshal failed: %w", ErrOpnsense401)

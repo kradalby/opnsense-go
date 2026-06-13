@@ -105,9 +105,17 @@ func (c *Client) BgpNeighborGetUUIDs() ([]*uuid.UUID, error) {
 	uuids := []*uuid.UUID{}
 
 	for _, row := range response.Rows {
-		m := row.(map[string]interface{})
-		uuid, err := uuid.FromString(m["uuid"].(string))
+		m, ok := row.(map[string]interface{})
+		if !ok {
+			continue
+		}
 
+		id, ok := m["uuid"].(string)
+		if !ok {
+			continue
+		}
+
+		uuid, err := uuid.FromString(id)
 		if err == nil {
 			uuids = append(uuids, &uuid)
 		}

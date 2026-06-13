@@ -184,9 +184,17 @@ func (c *Client) WireGuardClientGetUUIDs() ([]*uuid.UUID, error) {
 	uuids := []*uuid.UUID{}
 
 	for _, row := range response.Rows {
-		m := row.(map[string]interface{})
+		m, ok := row.(map[string]interface{})
+		if !ok {
+			continue
+		}
 
-		uuid, err := uuid.FromString(m["uuid"].(string))
+		id, ok := m["uuid"].(string)
+		if !ok {
+			continue
+		}
+
+		uuid, err := uuid.FromString(id)
 		if err == nil {
 			uuids = append(uuids, &uuid)
 		}
@@ -335,9 +343,17 @@ func (c *Client) WireGuardServerGetUUIDs() ([]*uuid.UUID, error) {
 	uuids := []*uuid.UUID{}
 
 	for _, row := range response.Rows {
-		m := row.(map[string]interface{})
+		m, ok := row.(map[string]interface{})
+		if !ok {
+			continue
+		}
 
-		uuid, err := uuid.FromString(m["uuid"].(string))
+		id, ok := m["uuid"].(string)
+		if !ok {
+			continue
+		}
+
+		uuid, err := uuid.FromString(id)
 		if err == nil {
 			uuids = append(uuids, &uuid)
 		}
@@ -359,12 +375,23 @@ func (c *Client) WireGuardServerFindUUIDByName(name string) ([]*uuid.UUID, error
 	uuids := []*uuid.UUID{}
 
 	for _, row := range response.Rows {
-		m := row.(map[string]interface{})
-		if m["name"].(string) == name {
-			uuid, err := uuid.FromString(m["uuid"].(string))
-			if err == nil {
-				uuids = append(uuids, &uuid)
-			}
+		m, ok := row.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		if rowName, ok := m["name"].(string); !ok || rowName != name {
+			continue
+		}
+
+		id, ok := m["uuid"].(string)
+		if !ok {
+			continue
+		}
+
+		uuid, err := uuid.FromString(id)
+		if err == nil {
+			uuids = append(uuids, &uuid)
 		}
 	}
 

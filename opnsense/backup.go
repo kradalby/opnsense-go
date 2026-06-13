@@ -1,7 +1,7 @@
 package opnsense
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 )
 
@@ -18,7 +18,7 @@ func (c *Client) Backup() (string, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read GET response: %#v\n", err)
 
