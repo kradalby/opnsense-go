@@ -3,8 +3,8 @@ module github.com/kradalby/opnsense-go
 go 1.12
 
 require (
-	github.com/gobuffalo/envy v1.9.0
-	github.com/rogpeppe/go-internal v1.5.1 // indirect
+	github.com/gobuffalo/envy v1.10.2
 	github.com/satori/go.uuid v1.2.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
+	gopkg.in/errgo.v2 v2.1.0 // indirect
 )
